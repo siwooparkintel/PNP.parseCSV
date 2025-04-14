@@ -1,0 +1,69 @@
+[Step 1/11] Parsing and validating input arguments
+[ INFO ] Parsing input parameters
+[Step 2/11] Loading OpenVINO Runtime
+[ INFO ] OpenVINO:
+[ INFO ] Build ................................. 2025.1.0-18467-d737fa2d2aa
+[ INFO ] 
+[ INFO ] Device info:
+[ INFO ] NPU
+[ INFO ] Build ................................. 2025.1.0-18467-d737fa2d2aa
+[ INFO ] 
+[ INFO ] 
+[Step 3/11] Setting device configuration
+[Step 4/11] Reading model files
+[ INFO ] Loading model files
+[ INFO ] Read model took 00.00 ms
+[ INFO ] Original model I/O parameters:
+[ INFO ] Network inputs:
+[ INFO ]     image:0 (node: image:0) : f32 / [...] / []
+[ INFO ] Network outputs:
+[ INFO ]     compress_v1/Conv2d_13_pointwiseANDConv/Conv_4/BiasAdd:0 (node: compress_v1/Conv2d_13_pointwiseANDConv/Conv_4/BiasAdd:0) : f32 / [...] / []
+[Step 5/11] Resizing model to match image sizes and given batch
+[ WARNING ] image:0: layout is not set explicitly, so it is defaulted to NHWC. It is STRONGLY recommended to set layout manually to avoid further issues.
+[Step 6/11] Configuring input of the model
+[ INFO ] Model batch size: 1
+[ INFO ] Network inputs:
+[ INFO ]     image:0 (node: image:0) : f16 / [] / []
+[ INFO ] Network outputs:
+[ INFO ]     compress_v1/Conv2d_13_pointwiseANDConv/Conv_4/BiasAdd:0 (node: compress_v1/Conv2d_13_pointwiseANDConv/Conv_4/BiasAdd:0.0) : f16 / [...] / []
+[Step 7/11] Loading the model to the device
+[ INFO ] Compile model took 00.00 ms
+[ INFO ] Start of compilation memory usage: Peak 0 KB
+[ INFO ] End of compilation memory usage: Peak 0 KB
+[ INFO ] Compile model ram used 0 KB
+[Step 8/11] Querying optimal runtime parameters
+[ INFO ] Model:
+[ INFO ]   DEVICE_ID: 4000
+[ INFO ]   ENABLE_CPU_PINNING: NO
+[ INFO ]   EXECUTION_DEVICES: NPU
+[ INFO ]   EXECUTION_MODE_HINT: PERFORMANCE
+[ INFO ]   INFERENCE_PRECISION_HINT: f16
+[ INFO ]   LOADED_FROM_CACHE: NO
+[ INFO ]   MODEL_PRIORITY: MEDIUM
+[ INFO ]   NETWORK_NAME: tf2onnx
+[ INFO ]   NPU_COMPILATION_MODE_PARAMS: enable-adaptive-stripping=true
+[ INFO ]   NPU_COMPILER_DYNAMIC_QUANTIZATION: NO
+[ INFO ]   NPU_QDQ_OPTIMIZATION: NO
+[ INFO ]   NPU_TURBO: NO
+[ INFO ]   OPTIMAL_NUMBER_OF_INFER_REQUESTS: 1
+[ INFO ]   PERFORMANCE_HINT: LATENCY
+[ INFO ]   PERFORMANCE_HINT_NUM_REQUESTS: 1
+[ INFO ]   PERF_COUNT: NO
+[ INFO ]   WORKLOAD_TYPE: DEFAULT
+[Step 9/11] Creating infer requests and preparing input tensors
+[ WARNING ] No input files were given: all inputs will be filled with random values!
+[ INFO ] Test Config 0
+[ INFO ] image:0  ([], f16, [], static):	random (image/numpy array is expected)
+[Step 10/11] Measuring performance (Start inference synchronously, limits: 0 ms duration)
+[ INFO ] Benchmarking in inference only mode (inputs filling are not included in measurement loop).
+[ INFO ] First inference took 0.00 ms
+[Step 11/11] Dumping statistics report
+[ INFO ] Execution Devices: [ NPU ]
+[ INFO ] Count:               0 iterations
+[ INFO ] Duration:            20000.06 ms
+[ INFO ] Latency:
+[ INFO ]    Median:           0.00 ms
+[ INFO ]    Average:          0.00 ms
+[ INFO ]    Min:              0.00 ms
+[ INFO ]    Max:              0.0 ms
+[ INFO ] Throughput:          00.00 FPS
