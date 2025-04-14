@@ -1,0 +1,15 @@
+﻿index,section,folder,folder2,file_name,start,end,gap,duration
+0,edge,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,5.82,23.02,-19.72,17.2
+1,resnet,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,23.02,113.36,-19.72,90.34
+2,sd1,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,113.95,124,-19.72,10.05
+3,wiki,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,125.49,165.75,-19.72,40.26
+4,gimg,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,168.09,214.89,-19.72,46.8
+5,Amazon,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,216.7,297.35,-19.72,80.65
+6,insta,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,299.26,339.57,-19.72,40.31
+7,inkedin1,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,341.45,381.77,-19.72,40.32
+8,gseattle,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,384.06,429.25,-19.72,45.19
+9,sd2,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,430,519.43,-19.72,89.43
+10,inkedin2,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,519.52,630.43,-19.72,110.91
+11,nyt,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,632.9,678.15,-19.72,45.25
+12,giphy,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,680,720,-19.72,40
+13,twitch,CataV3_IT_socwatch2025.1.0,socwatch,CataV3_IT,722.67,843.01,-19.72,120.34
