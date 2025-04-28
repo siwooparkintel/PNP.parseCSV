@@ -4,7 +4,7 @@ import csv
 
 
 # time table CSV file location, socwatch folder structure should follow in it
-BA="\\\\amr.corp.intel.com\\EC\\proj\\pst\\jf\\SPA-Lab\\Siwoo\\CatapultV3\\WW2511.5_CataV3_IT\\CataV3_IT\\Socwatch"
+BA="\\\\[address]\\EC\\proj\\pst\\jf\\SPA-Lab\\Siwoo\\CatapultV3\\WW2511.5_CataV3_IT\\CataV3_IT\\Socwatch"
 
 
 #======================================================================================
