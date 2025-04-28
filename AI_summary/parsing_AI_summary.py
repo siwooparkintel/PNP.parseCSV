@@ -53,7 +53,7 @@ DAQ_target = {
 }
 
 #BASE = os.getcwd()
-BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\full_data"
+BASE = "\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\full_data"
 
 #result_list_csv = f"{BA}\\file_list.csv"
 parsed_csv = f"{BASE}\\AI_models_parsed_results.csv"
@@ -231,45 +231,5 @@ main()
 # example of the parsed model output result data structure
 # =======================================================
 '''
-{
-'ID_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_000',
-'data_label': 'Model_A3_v1_2_3_qdq_proxy_stripped',
-'data_type': ['POWER', 'ETL'], 
-'power_data': {'V_VAL_VCC_PCORE': 0.930583, 'I_VAL_VCC_PCORE': 4.14682, 'V_VAL_VCC_ECORE': 0.426789, 'I_VAL_VCC_ECORE': 0.661671, 'V_VAL_VCCSA': 0.828573, 'I_VAL_VCCSA': 0.692554, 'V_VAL_VCCGT': 0.694191, 'I_VAL_VCCGT': 4.886309, 'P_VCC_PCORE': 5.298088, 'P_VCC_ECORE': 0.601947, 'P_VCCSA': 0.630201, 'P_VCCGT': 4.426103, 'P_VCCL2': 0.016427, 'P_VCC1P8': 0.061738, 'P_VCCIO': 0.209027, 'P_VCCDDRIO': 0.060283, 'P_VNNAON': 0.115388, 'P_VNNAONLV': 0.01005, 'P_VDDQ': 0.02288, 'P_VDD2H': 0.452025, 'P_VDD2L': 0.020797, 'P_V1P8U_MEM': 0.033313, 'P_SOC+MEMORY': 11.959465, 'Run Time': 26.2, 'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\AI_GPU_model_stripped_000\\AI_GPU_model_stripped_000_pacs-summary.csv', 'power_type': 'ETL_POWER', 'picked': 'picked'},
-'etl_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\AI_GPU_model_stripped_000.etl',
-'model_output_obj': {'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\GPU_Model_A3_v1_2_3_qdq_proxy_stripped_output.txt', 'model_output_data': {'read_model': [22.14, 'ms'], 'compile_model': [282.19, 'ms'], 'start_mem_usage': [None, ''], 'end_mem_usage': [None, ''], 'ram_used': [None, ''], 'first_inference': [1.65, 'ms'], 'device': ['GPU.', ''], 'iterations': [44524.0, ''], 'duration': [20012.68, 'ms'], 'latency_median': [0.43, 'ms'], 'throughput': [2224.79, 'FPS']}, 'model_output_status': 'successful'}
-},
 
-{
-'ID_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_001',
-'data_label': 'Model_A3_v1_2_3_qdq_proxy_stripped',
-'data_type': ['POWER'], 
-'power_data': {'V_VAL_VCC_PCORE': 0.974846, 'I_VAL_VCC_PCORE': 4.451328, 'V_VAL_VCC_ECORE': 0.393696, 'I_VAL_VCC_ECORE': 0.560568, 'V_VAL_VCCSA': 0.802704, 'I_VAL_VCCSA': 0.61567, 'V_VAL_VCCGT': 0.72095, 'I_VAL_VCCGT': 5.220127, 'P_VCC_PCORE': 5.713308, 'P_VCC_ECORE': 0.502492, 'P_VCCSA': 0.534047, 'P_VCCGT': 4.730054, 'P_VCCL2': 0.01456, 'P_VCC1P8': 0.061015, 'P_VCCIO': 0.115397, 'P_VCCDDRIO': 0.049966, 'P_VNNAON': 0.077361, 'P_VNNAONLV': 0.00759, 'P_VDDQ': 0.019183, 'P_VDD2H': 0.401964, 'P_VDD2L': 0.022827, 'P_V1P8U_MEM': 0.028216, 'P_SOC+MEMORY': 12.279085, 'Run Time': 25.2, 'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_001\\AI_GPU_model_stripped_001\\AI_GPU_model_stripped_001_pacs-summary.csv', 'power_type': 'POWER'},
-'model_output_obj': {'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_001\\GPU_Model_A3_v1_2_3_qdq_proxy_stripped_output.txt', 'model_output_data': {'read_model': [8.38, 'ms'], 'compile_model': [228.12, 'ms'], 'start_mem_usage': [None, ''], 'end_mem_usage': [None, ''], 'ram_used': [None, ''], 'first_inference': [1.45, 'ms'], 'device': ['GPU.', ''], 'iterations': [47521.0, ''], 'duration': [20000.8, 'ms'], 'latency_median': [0.39, 'ms'], 'throughput': [2375.96, 'FPS']}, 'model_output_status': 'successful'}
-},
-
-{
-'ID_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_004',
-'data_label': 'Model_A3_v1_2_3_qdq_proxy_stripped',
-'data_type': ['POWER', 'SOCWATCH'],
-'power_data': {'V_VAL_VCC_PCORE': 1.092376, 'I_VAL_VCC_PCORE': 6.75938, 'V_VAL_VCC_ECORE': 0.402821, 'I_VAL_VCC_ECORE': 0.115688, 'V_VAL_VCCSA': 0.759344, 'I_VAL_VCCSA': 0.525504, 'V_VAL_VCCGT': 0.704935, 'I_VAL_VCCGT': 4.958847, 'P_VCC_PCORE': 8.579051, 'P_VCC_ECORE': 0.086437, 'P_VCCSA': 0.418763, 'P_VCCGT': 4.493119, 'P_VCCL2': 0.002966, 'P_VCC1P8': 0.071756, 'P_VCCIO': 0.411603, 'P_VCCDDRIO': 0.039072, 'P_VNNAON': 0.202622, 'P_VNNAONLV': 0.015292, 'P_VDDQ': 0.013748, 'P_VDD2H': 0.341798, 'P_VDD2L': 0.031004, 'P_V1P8U_MEM': 0.027867, 'P_SOC+MEMORY': 14.737569, 'Run Time': 25.8, 'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_004\\AI_GPU_model_stripped_004\\AI_GPU_model_stripped_004_pacs-summary.csv', 'power_type': 'SOCWATCH_POWER', 'picked': 'picked'},
-'model_output_obj': {'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_004\\GPU_Model_A3_v1_2_3_qdq_proxy_stripped_output.txt', 'model_output_data': {'read_model': [8.36, 'ms'], 'compile_model': [229.75, 'ms'], 'start_mem_usage': [None, ''], 'end_mem_usage': [None, ''], 'ram_used': [None, ''], 'first_inference': [1.79, 'ms'], 'device': ['GPU.', ''], 'iterations': [45097.0, ''], 'duration': [20007.72, 'ms'], 'latency_median': [0.41, 'ms'], 'throughput': [2253.98, 'FPS']}, 'model_output_status': 'successful'},
-'socwatch_data': '=========== hi ! in socwatch_summary_parser.py \\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\mixedTest\\GPU\\Model_A3_v1_2_3_qdq_proxy_stripped\\AI_GPU_model_stripped_004\\socwatch\\AI_GPU_model_stripped.csv'},
-
-
-
-
-# model_parsed data structure
-{'model_output_obj': {
-    'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\GPU\\Model_A3_1_2_0_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\GPU_Model_A3_1_2_0_qdq_proxy_stripped_output.txt',
-    'model_output_data': {
-        'read_model': [16.09, 'ms'],
-        'compile_model': [2904.89, 'ms'],
-        'first_inference': [1.45, 'ms'],
-        'latency_median': [0.41, 'ms'],
-        'throughput': [2311.1, 'FPS']
-        },
-    'model_output_status': 'successful'
-    }
-}
 '''
