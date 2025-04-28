@@ -46,7 +46,7 @@ def sortAndPick(objs) :
     markPicked(sorted_socwatches)
 
 
-    # sort working !!!
+    # sort working. commented out reverse also working
     # sorted_etls = sorted(etls, key=lambda x: x["power_data"]['P_SOC+MEMORY'], reverse=True)
     # sorted_powers = sorted(powers, key=lambda x: x["power_data"]['P_SOC+MEMORY'], reverse=True)
     # sorted_socwatches = sorted(socwatches, key=lambda x: x["power_data"]['P_SOC+MEMORY'], reverse=True)
@@ -64,7 +64,7 @@ def pullSameLabel(whole_sets, label) :
             temp.reverse()
             block["power_data"]["power_type"] = "_".join(temp)
             #block["power_data"].update({"power_type": "===================================="})
-            print("========", block['power_data']['P_SOC+MEMORY'])
+            # print("========", block['power_data']['P_SOC+MEMORY'])
             power_list.append(block)
 
     return power_list
@@ -90,4 +90,4 @@ def checkAndMarkPower(whole_sets) :
     
 
 
-    print(f"=========== Hi! in checkAndMarkPower.py {len(whole_sets)} all data set looks good!")
+    # print(f"=========== Hi! in checkAndMarkPower.py {len(whole_sets)} all data set looks good!")
