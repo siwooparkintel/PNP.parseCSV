@@ -116,19 +116,7 @@ def loadModelCSVresults(csv_list) :
 # example of the parsed result data structure
 # =======================================================
 '''
-# model_parsed data structure
-{'model_output_obj': {
-    'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\GPU\\Model_A3_1_2_0_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\GPU_Model_A3_1_2_0_qdq_proxy_stripped_output.txt',
-    'model_output_data': {
-        'read_model': [16.09, 'ms'],
-        'compile_model': [2904.89, 'ms'],
-        'first_inference': [1.45, 'ms'],
-        'latency_median': [0.41, 'ms'],
-        'throughput': [2311.1, 'FPS']
-        },
-    'model_output_status': 'successful'
-    }
-}
+
 '''
 
 
