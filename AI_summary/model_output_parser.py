@@ -108,6 +108,7 @@ def loadModelCSVresults(csv_list) :
 # example of the parsed result data structure
 # =======================================================
 '''
+<<<<<<< HEAD
 # model_parsed data structure
 {'model_output_obj': {
     'model_output_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\GPU\\Model_A3_1_2_0_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\GPU_Model_A3_1_2_0_qdq_proxy_stripped_output.txt',
@@ -121,6 +122,9 @@ def loadModelCSVresults(csv_list) :
     'model_output_status': 'successful'
     }
 }
+=======
+
+>>>>>>> bc36b37b81d1731fe1c7ed3eba4acfb913e7e0b3
 '''
 
 

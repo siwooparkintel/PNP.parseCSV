@@ -10,7 +10,7 @@ current_folder = os.getcwd()
 # =======================================================
 # if you need to use hardcoded way to feed the data, do it here
 # =======================================================
-# BA="\\\\amr.corp.intel.com\\EC\\proj\\pst\\jf\\SPA-Lab\\Siwoo\\GPUNPU\\WW2515.3_MS_profiles\\NPU_ACBP_Perf"
+
 BA = os.getcwd()
 #result_list_csv = f"{BA}\\file_list.csv"
 
