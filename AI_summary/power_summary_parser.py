@@ -12,7 +12,8 @@ AVERAGE = "Average"
 
 def parsePowerSummaryCSV(csv_path, DAQ_target) :
     
-    power_collection = dict()
+    power_data = dict()
+    power_obj = {"power_data":power_data}
     # reading csv file
     with open(csv_path, encoding='utf-8-sig', newline='') as csvfile:
         
@@ -44,15 +45,14 @@ def parsePowerSummaryCSV(csv_path, DAQ_target) :
                 t_rail = rows[power_rail_index]
                 # print(power_rail_index, type(rows[power_rail_index]), rows[power_rail_index], target_rail)
                 if t_rail[0]== target_rail:
-                    power_collection[target_rail] = float(t_rail[avr_index])
+                    power_data[target_rail] = float(t_rail[avr_index])
                     break
 
-        power_collection['Energy (J)'] = power_collection["P_SOC+MEMORY"] * power_collection["Run Time"]
+        power_data['Energy (J)'] = power_data["P_SOC+MEMORY"] * power_data["Run Time"]
+        # power_data['Eng(J)/Frame'] = None
 
-
-        power_collection['file_path'] = csv_path
+        power_obj['file_path'] = csv_path
         # power_collection['data_type'] 
-        return power_collection
-
+        return power_obj
 
 

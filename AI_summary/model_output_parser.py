@@ -19,12 +19,6 @@ def readTextfile(abs_path, AI_parsing_items) :
             # print(type(line), line)
             # d_found = line.rfind("[ INFO ] Execution Devices:")
 
-            # if d_found >=0:
-            #     # print(line)
-            #     # parsed['device'] = [line[d_found:].split("'")[1], ""]
-            #     parsed['device'] = [line[len():].split("'")[1], ""]
-            #     # parsed['device'] = [line[d_found:].split("'")[1], ""]
-
             for item in AI_parsing_items:
                 #print(type(item), item)
                 target_text = item["lookup"]
@@ -40,9 +34,7 @@ def readTextfile(abs_path, AI_parsing_items) :
                     break
                 elif item["key"] not in parsed:
                     parsed[item["key"]] = [None, ""]
-                
-                
-            
+
         # print("[SI] ====================", parsed)
 
         return parsed
@@ -118,7 +110,7 @@ def loadModelCSVresults(csv_list) :
 '''
 # model_parsed data structure
 {'model_output_obj': {
-    'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\GPU\\Model_A3_1_2_0_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\GPU_Model_A3_1_2_0_qdq_proxy_stripped_output.txt',
+    'model_output_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\GPU\\Model_A3_1_2_0_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\GPU_Model_A3_1_2_0_qdq_proxy_stripped_output.txt',
     'model_output_data': {
         'read_model': [16.09, 'ms'],
         'compile_model': [2904.89, 'ms'],
