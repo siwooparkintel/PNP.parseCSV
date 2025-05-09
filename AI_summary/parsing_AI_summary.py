@@ -83,21 +83,21 @@ hobl_sets = list()
 '''
 ====================================================================================
 To parse everything: 
-{'power_pick':MED, 'report_picks':['ETL_POWER', 'POWER', 'POWER_SOCWATCH'], 'only_picks':False}
+
 
 To parse everything picked by power_pick (MIN, MAX, Median)
-{'power_pick':MIN, 'report_picks':['ETL_POWER', 'POWER', 'POWER_SOCWATCH'], 'only_picks':True} => this parse one each
+
 
 To parse only median picked power
-{'power_pick':MED, 'report_picks':['POWER'], 'only_picks':True}
+
 
 To parse every POWER_SOCWATCH
-{'power_pick':MED, 'report_picks':['POWER_SOCWATCH'], 'only_picks':False}
+
 ====================================================================================
 '''
 # data_direction : 'vertical' or 'horizontal'
 
-picks = {'only_picks':True, 'report_picks':['POWER_SOCWATCH'], 'power_pick':MIN, 'data_direction':'vertical'}
+picks = {'only_picks':True, 'power_pick':MED, 'data_direction':'vertical'}
 
 
 
@@ -134,11 +134,12 @@ def pullData(abs_path) :
 
 def calFromPowerModel(block) :
     if 'power_obj' in block and 'model_output_obj' in block :
-        if 'power_data' in block['power_obj'] and 'model_output_data' in block['model_output_obj']:
-           
+        if 'power_data' in block['power_obj'] and block['model_output_obj']['model_output_status'] != "failed" and 'model_output_data' in block['model_output_obj']:
             # calculate 'Eng(J)/Frame' here
             block['power_obj']['power_data']['Eng(J)/Frame'] = block['power_obj']['power_data']['Energy (J)'] / block['model_output_obj']['model_output_data']['throughput'][0]
-
+        else :
+            # tools.errorAndExit("===error in claFromPowerModel===" + str(block))
+            block['power_obj']['power_data']['Eng(J)/Frame'] = "n/a"
 
 def add_etl(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
@@ -177,8 +178,6 @@ def add_socwatch(abs_path):
     dataset["socwatch_obj"] = soc.parseSocwatch(abs_path)
 
 
-
-
 def fileClassifier(abs_path, f):
 
     file_type = CL_UNCLASSIFIED
@@ -189,59 +188,46 @@ def fileClassifier(abs_path, f):
         # print("ETL detected ", abs_path, f)
         add_etl(abs_path)
         file_type = CL_ETL
-    # elif f.find(CL_OUTPUT) >= 0 and f.find(CL_AI_MODEL) >= 0 :
     elif f.find(CL_OUTPUT) >= 0 :
-        # print("AI_model output detected ", abs_path, f)
         add_model_output(abs_path)
         file_type = CL_OUTPUT
     elif f.find(CL_DAQ_SUMMARY) >= 0:
-        #print("DAQ power summary detected ", abs_path, f)
         add_power(abs_path)
         file_type = CL_DAQ_SUMMARY
     elif f.find(CL_SOCWATCH) >= 0:
-        #workload_name = "_".join(f.split("_")[:-1])
-        #upto_path = ("\\").join(abs_path.split("\\")[:-1])
         workload_name = tools.splitLastItem(f, "_", 1)[0]
         upto_path = tools.splitLastItem(abs_path, "\\", 1)[0]
         soc_summary = workload_name + ".csv"
         summary_fullPath = os.path.join(upto_path, soc_summary)
         if os.path.exists(summary_fullPath) :
-            # print("Socwatch ETL detected : ", f, " ::: detected summary : ", summary_fullPath)
             add_socwatch(summary_fullPath)
         else :
-            print("=========================== No Socwatch summary, Socwatch post-process may have interrupted", abs_path)
+            print("===== No Socwatch summary, Socwatch post-process may have interrupted", abs_path)
         file_type = CL_SOCWATCH
     return file_type
-
 
 
 def detectAndParseFile(path) :
 
     for f in os.listdir(path):
         abs_path = os.path.join(path, f)
-
-        if f == "Model_A3_v1_2_3_qdq_proxy_stripped":
-            break
-
+        # if f == "Model_A3_v1_2_3_qdq_proxy_stripped":
+        #     break
         if os.path.isfile(abs_path):
             fType = fileClassifier(abs_path, f)
             if fType == CL_SOCWATCH :
-
                 # after detecting first Socwatch ETL, and it's summary, no need to go further
                 break
         else:
             #recursive on a folder detection
             detectAndParseFile(abs_path)
 
-
 def main():
-
     detectAndParseFile(BASE)
     pck.checkAndMarkPower(hobl_sets, picks)
-    print("====[hobl_sets]", hobl_sets)
+    # print("====[hobl_sets]", hobl_sets)
+    # print("++++++++++++++++++++", soc.getSocwatchHeader())
     rpt.writeParsedInCSV(result_csv, hobl_sets, AI_parsing_items, picks)
-
-
 
 
 main()
@@ -252,21 +238,104 @@ main()
 # =======================================================
 # example of the parsed model output result data structure
 # =======================================================
-'''
+
 
 
 
 # model_parsed data structure
-{'model_output_obj': {
-    'model_output_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\GPU\\Model_A3_1_2_0_qdq_proxy_stripped\\AI_GPU_model_stripped_000\\GPU_Model_A3_1_2_0_qdq_proxy_stripped_output.txt',
+"""
+{'ID_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_003',
+'data_label': 'Model_C2_v1_2_1_qdq_proxy',
+'data_type': ['POWER'], 
+'power_obj': {
+    'power_data': {
+        'V_VAL_VCC_PCORE': 0.81286,
+        'I_VAL_VCC_PCORE': 1.008848,
+        'V_VAL_VCC_ECORE': 0.197352, 'I_VAL_VCC_ECORE': 0.030435, 'V_VAL_VCCSA': 1.103559, 'I_VAL_VCCSA': 5.676103, 'V_VAL_VCCGT': 0.000814, 'I_VAL_VCCGT': 5.9e-05, 'P_VCC_PCORE': 0.983881, 'P_VCC_ECORE': 0.016794, 'P_VCCSA': 6.850881, 'P_VCCGT': 0.000116, 'P_VCCL2': 0.000939, 'P_VCC1P8': 0.067862, 'P_VCCIO': 0.179597, 'P_VCCDDRIO': 0.15445, 'P_VNNAON': 0.10042, 'P_VNNAONLV': 0.007033, 'P_VDDQ': 0.078012, 'P_VDD2H': 1.026172, 'P_VDD2L': 0.002483, 'P_V1P8U_MEM': 0.060241,
+        'P_SOC+MEMORY': 9.535497, 
+        'Run Time': 25.6, 
+        'Energy (J)': 244.1087232, 
+        'Eng(J)/Frame': 0.1339372767974717},
+    'file_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_003\\AI_NPU_model_stripped_003\\AI_NPU_model_stripped_003_pacs-summary.csv',
+    'power_type': 'POWER',
+    'picked': 'picked'},
+'model_output_obj': {
+    'model_output_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_003\\NPU_Model_C2_v1_2_1_qdq_proxy_output.txt',
     'model_output_data': {
-        'read_model': [16.09, 'ms'],
-        'compile_model': [2904.89, 'ms'],
-        'first_inference': [1.45, 'ms'],
-        'latency_median': [0.41, 'ms'],
-        'throughput': [2311.1, 'FPS']
-        },
-    'model_output_status': 'successful'
-    }
-}
-'''
+        'read_model': [26.19, 'ms'],
+        'compile_model': [35.88, 'ms'],
+        'start_mem_usage': [126644.0, 'KB'],
+        'end_mem_usage': [145424.0, 'KB'], 
+        'ram_used': [18780.0, 'KB'], 
+        'first_inference': [4.13, 'ms'], 
+        'device': ['NPU', ''], 
+        'iterations': [36452.0, ''], 
+        'duration': [20000.45, 'ms'], 
+        'latency_median': [0.54, 'ms'], 
+        'throughput': [1822.56, 'FPS']},
+    'model_output_status': 'successful'}
+},
+
+{'ID_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004', 'data_label': 'Model_C2_v1_2_1_qdq_proxy', 
+'data_type': ['POWER', 'SOCWATCH'],
+'power_obj': {
+    'power_data': {
+        'V_VAL_VCC_PCORE': 0.747903, 'I_VAL_VCC_PCORE': 0.991634, 
+        'V_VAL_VCC_ECORE': 0.279867, 'I_VAL_VCC_ECORE': 0.039626, 
+        'V_VAL_VCCSA': 1.104632, 'I_VAL_VCCSA': 5.497834, 
+        'V_VAL_VCCGT': 0.000573, 'I_VAL_VCCGT': -0.000137, 
+        'P_VCC_PCORE': 0.936324, 
+        'P_VCC_ECORE': 0.02296, 
+        'P_VCCSA': 6.644626, 
+        'P_VCCGT': 3.4e-05, 
+        'P_VCCL2': 0.001612, 
+        'P_VCC1P8': 0.069989, 
+        'P_VCCIO': 0.396728, 
+        'P_VCCDDRIO': 0.152057, 
+        'P_VNNAON': 0.193041, 
+        'P_VNNAONLV': 0.013124, 
+        'P_VDDQ': 0.076898, 
+        'P_VDD2H': 1.004154, 
+        'P_VDD2L': 0.002397, 
+        'P_V1P8U_MEM': 0.059089, 
+        'P_SOC+MEMORY': 9.579855, 
+        'Run Time': 25.4, 
+        'Energy (J)': 243.328317, 
+        'Eng(J)/Frame': 0.13881709253966354}, 
+    'file_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004_pacs-summary.csv',
+    'power_type': 'POWER_SOCWATCH', 
+    'picked': 'picked'},
+'model_output_obj': {
+    'model_output_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004\\NPU_Model_C2_v1_2_1_qdq_proxy_output.txt',
+    'model_output_data': {
+        'read_model': [26.19, 'ms'], 
+        'compile_model': [44.46, 'ms'], 
+        'start_mem_usage': [126708.0, 'KB'], 
+        'end_mem_usage': [145232.0, 'KB'], 
+        'ram_used': [18524.0, 'KB'], 
+        'first_inference': [9.73, 'ms'], 
+        'device': ['NPU', ''], 
+        'iterations': [35058.0, ''], 
+        'duration': [20000.36, 'ms'], 
+        'latency_median': [0.56, 'ms'], 
+        'throughput': [1752.87, 'FPS']
+    }, 
+    'model_output_status': 'successful'}, 
+'socwatch_obj': {
+    'socwatch_path': '\\\\255.255.255.255\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004\\socwatch\\AI_NPU_model_stripped.csv',
+    'socwatch_tables': [
+        {'label': 'pkg_cstate', 
+         'table_data': [
+            ['C-State', 'Package Residency (%)', 'Package Residency (msec)'], 
+            ['PC0', '68.54', '23559.76'], 
+            ['PC2', '1.79', '615.24'], 
+            ['PC6.1', '0.00', '0.00'], 
+            ['PC6.2', '0.21', '72.28'], 
+            ['PC10.1', '0.15', '53.21'], 
+            ['PC10.2', '29.31', '10075.41'], 
+            ['PC10.3', '0.00', '0.00']], 
+        'isOpen': False
+        },{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}]
+}}]
+
+"""
