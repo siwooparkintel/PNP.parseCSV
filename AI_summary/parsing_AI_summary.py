@@ -3,12 +3,12 @@ import os
 import time
 from os import listdir
 from os.path import isfile, join
-import tools
-import model_output_parser as mop
-import socwatch_summary_parser as soc
-import power_summary_parser as psp
-import power_checker as pck
-import reporter as rpt
+import parsers.tools as tools
+import parsers.model_output_parser as mop
+import parsers.socwatch_summary_parser as soc
+import parsers.power_summary_parser as psp
+import parsers.power_checker as pck
+import parsers.reporter as rpt
 
 
 socwatch_targets = [
@@ -102,7 +102,7 @@ MED = "MED"
 
 
 #BASE = os.getcwd()
-BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\full_data"
+BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data"
 
 #result_list_csv = f"{BA}\\file_list.csv"
 result_csv = f"{BASE}\\AI_models_parsed_results"

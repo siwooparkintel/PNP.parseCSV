@@ -1,13 +1,11 @@
 import csv
-import tools
-
+import parsers.tools as tools
 
 
 fields = []
 rows = []
 
 AVERAGE = "Average"
-
 
 
 def parsePowerSummaryCSV(csv_path, DAQ_target) :
@@ -23,8 +21,6 @@ def parsePowerSummaryCSV(csv_path, DAQ_target) :
         # extracting field names through first row
         fields = next(csvreader)
         
-        # printing the field names
-        # print('Field names are:' + ', '.join(field for field in fields))
 
         avr_index = -1
         try:

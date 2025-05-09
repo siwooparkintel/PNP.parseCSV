@@ -1,6 +1,5 @@
 import csv
-import tools
-import socwatch_summary_parser as soc
+import parsers.socwatch_summary_parser as soc
 
 
 head_list = ["model_name"]

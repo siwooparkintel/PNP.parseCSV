@@ -1,10 +1,4 @@
-
 import math
-
-# PICK_DATA = "MED" # "MIN", "MAX", "MED" all working
-
-
-
 
 
 
@@ -18,8 +12,6 @@ def markPicked(list, PICKED):
             list[int(len(list)/2)]['power_obj']['picked'] = 'picked'
         elif PICKED == "MED" and len(list)%2 == 1:
             list[math.floor(len(list)/2)]['power_obj']['picked'] = 'picked'
-
-
 
 
 def sortAndPick(objs, picks) :
@@ -63,8 +55,6 @@ def pullSameLabel(whole_sets, label) :
             temp = block["data_type"].copy()
             temp.sort()
             block["power_obj"]["power_type"] = "_".join(temp)
-            #block["power_data"].update({"power_type": "===================================="})
-            # print("========", block['power_data']['P_SOC+MEMORY'])
             power_list.append(block)
 
     return power_list
@@ -85,9 +75,3 @@ def checkAndMarkPower(whole_sets, picks) :
             
     
         
-
-
-    
-
-
-    # print(f"=========== Hi! in checkAndMarkPower.py {len(whole_sets)} all data set looks good!")
