@@ -1,37 +1,8 @@
 
-"""
-Socwatch Options:
-Command line options: -s 0 -o c:\hobl_data\socwatch\AI_GPU_model_stripped -f temp -f npu -f gfx -f memss-pstate -f cpu-cstate -f hw-cpu-hwp -f hw-cpu-cstate -f hw-cpu-pstate -f os-cpu-cstate -f os-cpu-pstate -f hw-igfx-cstate -f hw-igfx-pstate -f display-state -f ddr-bw -f bw-all -f noc-pstate -f media-pstate -m -r auto --no-post-processing 
-"""
 
-socwatch_targets = [
-    {"key": "CPU_model", "lookup": "CPU native model"},
-    {"key": "PKG_Cstate", "lookup": "Platform Monitoring Technology CPU Package C-States Residency Summary: Residency (Percentage and Time)"},
-    {"key": "Core_Cstate", "lookup": "Core C-State Summary: Residency (Percentage and Time)"},
-    {"key": "ACPI_Cstate", "lookup": "Core C-State (OS) Summary: Residency (Percentage and Time)"},
-    {"key": "OS_wakeups", "lookup": "Processes by Platform Busy Duration"},
-    {"key": "CPU_Pavr", "lookup": "CPU P-State Average Frequency (excluding CPU idle time)"},
-    {"key": "CPU_Pstate", "lookup": "CPU P-State/Frequency Summary: Residency (Percentage and Time)"},
-    {"key": "RC_Cstate", "lookup": "Integrated Graphics C-State  Summary: Residency (Percentage and Time)"},
-    {"key": "DDR_BW", "lookup": "DDR Bandwidth Requests by Component Summary: Average Rate and Total"},
-    {"key": "IO_BW", "lookup": "IO Bandwidth Summary: Average Rate and Total"},
-    {"key": "VC1_BW", "lookup": "Display VC1 Bandwidth Summary: Average Rate and Total"},
-    {"key": "NPU_BW", "lookup": "Neural Processing Unit (NPU) to Memory Bandwidth Summary: Average Rate and Total"},
-    {"key": "Media_BW", "lookup": "Media to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
-    {"key": "IPU_BW", "lookup": "Image Processing Unit (IPU) to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
-    {"key": "CCE_BW", "lookup": "CCE to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
-    {"key": "GT_BW", "lookup": "Network on a Chip GT Bandwidth Summary: Average Rate and Total"},
-    {"key": "D2D_BW", "lookup": "Network on a Chip Die to Die Bandwidth Summary: Average Rate and Total"},
-    {"key": "CPU_temp", "lookup": "Temperature Metrics Summary - Sampled: Min/Max/Avg"},
-    {"key": "SoC_temp", "lookup": "SoC Domain Temperatures Summary - Sampled: Min/Max/Avg"},
-    {"key": "NPU_Dstate", "lookup": "Neural Processing Unit (NPU) D-State Residency Summary: Residency (Percentage and Time)"},
-    {"key": "DC_count", "lookup": "Dynamic Display State Enabling"},
-    {"key": "Media_Cstate", "lookup": "Media C-State Residency Summary: Residency (Percentage and Time)"},
-    {"key": "NPU_Pstate", "lookup": "Neural Processing Unit (NPU) P-State Summary - Sampled: Approximated Residency (Percentage)"},
-    {"key": "MEMSS_Pstate", "lookup": "Memory Subsystem (MEMSS) P-State Summary - Sampled: Approximated Residency (Percentage)"},
-    {"key": "NoC_Pstate", "lookup": "Network on Chip (NoC) P-State Summary - Sampled: Approximated Residency (Percentage)"},
-    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)"}
-]
+# Socwatch Options:
+# Command line options: -s 0 -o c:\hobl_data\socwatch\AI_GPU_model_stripped -f temp -f npu -f gfx -f memss-pstate -f cpu-cstate -f hw-cpu-hwp -f hw-cpu-cstate -f hw-cpu-pstate -f os-cpu-cstate -f os-cpu-pstate -f hw-igfx-cstate -f hw-igfx-pstate -f display-state -f ddr-bw -f bw-all -f noc-pstate -f media-pstate -m -r auto --no-post-processing 
+
 
 socwatch_header_dict = dict()
 
@@ -166,7 +137,7 @@ def extractHeader(table) :
         socwatch_header_dict[table["label"]] = set_keys
 
 
-def parseSocwatch(abs_path) :
+def parseSocwatch(abs_path, socwatch_targets) :
 
     socwatch_obj = dict()
     socwatch_obj['socwatch_path'] = abs_path
@@ -205,16 +176,29 @@ def parseSocwatch(abs_path) :
                     tTable['isCompleted'] = False  
 
         return socwatch_obj
-    
-def getSocwatchHeader() :
-    # print("========== in getSocwatchHeader(): ", socwatch_header_dict)
-    for key in socwatch_header_dict:
-        # print(key)
-        if "_Pstate" in key and "CPU_Pstate" not in key :
-            copied = socwatch_header_dict[key].copy()[1:]
+
+# def getBuckets(key) :
+#     for item in socwatch_targets :
+#         if key == item["key"] and "buckets" in item :
+#             return item['buckets']
+#     return None
+        
+def pStateBecketizer(header_dict, socwatch_targets) :
+
+    for item in socwatch_targets : 
+        if "buckets" in item :
+            key = item["key"]
             new_list = list()
-            new_list.append(socwatch_header_dict[key][0])
-            new_list.extend(sorted(copied, key=int))
-            socwatch_header_dict[key] = new_list
-    # print("========== in getSocwatchHeader(): ", socwatch_header_dict)    
+            new_list.append(header_dict[key][0])
+            new_list.extend(item["buckets"])
+            header_dict[key] = new_list
+
+    # print("===", header_dict)
+
+
+
+
+
+def getSocwatchHeader(socwatch_targets) :
+    pStateBecketizer(socwatch_header_dict, socwatch_targets)
     return socwatch_header_dict

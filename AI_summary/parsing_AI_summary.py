@@ -1,5 +1,6 @@
 
 import os
+import time
 from os import listdir
 from os.path import isfile, join
 import tools
@@ -9,6 +10,35 @@ import power_summary_parser as psp
 import power_checker as pck
 import reporter as rpt
 
+
+socwatch_targets = [
+    {"key": "CPU_model", "lookup": "CPU native model"},
+    {"key": "PKG_Cstate", "lookup": "Platform Monitoring Technology CPU Package C-States Residency Summary: Residency (Percentage and Time)"},
+    {"key": "Core_Cstate", "lookup": "Core C-State Summary: Residency (Percentage and Time)"},
+    {"key": "ACPI_Cstate", "lookup": "Core C-State (OS) Summary: Residency (Percentage and Time)"},
+    {"key": "OS_wakeups", "lookup": "Processes by Platform Busy Duration"},
+    {"key": "CPU_Pavr", "lookup": "CPU P-State Average Frequency (excluding CPU idle time)"},
+    {"key": "CPU_Pstate", "lookup": "CPU P-State/Frequency Summary: Residency (Percentage and Time)"},
+    {"key": "RC_Cstate", "lookup": "Integrated Graphics C-State  Summary: Residency (Percentage and Time)"},
+    {"key": "DDR_BW", "lookup": "DDR Bandwidth Requests by Component Summary: Average Rate and Total"},
+    {"key": "IO_BW", "lookup": "IO Bandwidth Summary: Average Rate and Total"},
+    {"key": "VC1_BW", "lookup": "Display VC1 Bandwidth Summary: Average Rate and Total"},
+    {"key": "NPU_BW", "lookup": "Neural Processing Unit (NPU) to Memory Bandwidth Summary: Average Rate and Total"},
+    {"key": "Media_BW", "lookup": "Media to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
+    {"key": "IPU_BW", "lookup": "Image Processing Unit (IPU) to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
+    {"key": "CCE_BW", "lookup": "CCE to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
+    {"key": "GT_BW", "lookup": "Network on a Chip GT Bandwidth Summary: Average Rate and Total"},
+    {"key": "D2D_BW", "lookup": "Network on a Chip Die to Die Bandwidth Summary: Average Rate and Total"},
+    {"key": "CPU_temp", "lookup": "Temperature Metrics Summary - Sampled: Min/Max/Avg"},
+    {"key": "SoC_temp", "lookup": "SoC Domain Temperatures Summary - Sampled: Min/Max/Avg"},
+    {"key": "NPU_Dstate", "lookup": "Neural Processing Unit (NPU) D-State Residency Summary: Residency (Percentage and Time)"},
+    {"key": "DC_count", "lookup": "Dynamic Display State Enabling"},
+    {"key": "Media_Cstate", "lookup": "Media C-State Residency Summary: Residency (Percentage and Time)"},
+    {"key": "NPU_Pstate", "lookup": "Neural Processing Unit (NPU) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "1900", "1901-2900", "2901-3899", "3900"]},
+    {"key": "MEMSS_Pstate", "lookup": "Memory Subsystem (MEMSS) P-State Summary - Sampled: Approximated Residency (Percentage)"},
+    {"key": "NoC_Pstate", "lookup": "Network on Chip (NoC) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["400", "401-1049", "1050"]},
+    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-2049", "2050"]}
+]
 
 
 AI_parsing_items = [
@@ -72,7 +102,7 @@ MED = "MED"
 
 
 #BASE = os.getcwd()
-BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data"
+BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\full_data"
 
 #result_list_csv = f"{BA}\\file_list.csv"
 result_csv = f"{BASE}\\AI_models_parsed_results.csv"
@@ -175,7 +205,7 @@ def add_socwatch(abs_path):
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
     if SOCWATCH not in dataset["data_type"] :
         dataset["data_type"].append(SOCWATCH)
-    dataset["socwatch_obj"] = soc.parseSocwatch(abs_path)
+    dataset["socwatch_obj"] = soc.parseSocwatch(abs_path, socwatch_targets)
 
 
 def fileClassifier(abs_path, f):
@@ -223,14 +253,22 @@ def detectAndParseFile(path) :
             detectAndParseFile(abs_path)
 
 def main():
+
     detectAndParseFile(BASE)
     pck.checkAndMarkPower(hobl_sets, picks)
     # print("====[hobl_sets]", hobl_sets)
     # print("++++++++++++++++++++", soc.getSocwatchHeader())
-    rpt.writeParsedInCSV(result_csv, hobl_sets, AI_parsing_items, picks)
+    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, picks)
 
 
+start_time = time.perf_counter()
 main()
+end_time = time.perf_counter()
+elapsed_time = end_time - start_time
+print(f"Parsing Successful! [Elapsed time:::] {elapsed_time} seconds")
+
+
+
 
 
 
