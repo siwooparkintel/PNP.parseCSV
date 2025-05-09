@@ -105,10 +105,11 @@ MED = "MED"
 BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\full_data"
 
 #result_list_csv = f"{BA}\\file_list.csv"
-result_csv = f"{BASE}\\AI_models_parsed_results.csv"
+result_csv = f"{BASE}\\AI_models_parsed_results"
 
 hobl_sets = list()
 
+file_num = 0
 
 '''
 ====================================================================================
@@ -187,6 +188,8 @@ def add_model_output(abs_path):
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
     dataset["model_output_obj"] = mop.parseModelResults(abs_path, AI_parsing_items)
     calFromPowerModel(dataset)
+    global file_num
+    file_num += 1
 
 def add_power(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
@@ -197,6 +200,9 @@ def add_power(abs_path):
         dataset["data_type"].append(POWER)
     dataset["power_obj"] = psp.parsePowerSummaryCSV(abs_path, DAQ_target)
     calFromPowerModel(dataset)
+    global file_num
+    file_num += 1
+
 
 def add_socwatch(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
@@ -206,6 +212,9 @@ def add_socwatch(abs_path):
     if SOCWATCH not in dataset["data_type"] :
         dataset["data_type"].append(SOCWATCH)
     dataset["socwatch_obj"] = soc.parseSocwatch(abs_path, socwatch_targets)
+    global file_num
+    file_num += 1
+
 
 
 def fileClassifier(abs_path, f):
@@ -257,7 +266,6 @@ def main():
     detectAndParseFile(BASE)
     pck.checkAndMarkPower(hobl_sets, picks)
     # print("====[hobl_sets]", hobl_sets)
-    # print("++++++++++++++++++++", soc.getSocwatchHeader())
     rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, picks)
 
 
@@ -265,7 +273,7 @@ start_time = time.perf_counter()
 main()
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time
-print(f"Parsing Successful! [Elapsed time:::] {elapsed_time} seconds")
+print(f"Parsing {file_num} files Successful! [Elapsed time:::] {elapsed_time} seconds")
 
 
 

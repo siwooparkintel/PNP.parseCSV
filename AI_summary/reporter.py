@@ -10,6 +10,7 @@ data_lines = []
 data_vertical = []
 
 
+
 def queryData(data_label) :
     data_line = None
     for line_index in range(len(data_lines)-1, -1, -1):
@@ -103,48 +104,50 @@ def getSocwatchHeaderList(soc_dict) :
 
 def writeParsedInCSV(file_path, hobl_data, socwatch_targets, picks) :
     
-    with open(file_path, 'w', newline='') as file:
-        writer = csv.writer(file)
-        header = ['name']  
-        socwatch_header_dict = soc.getSocwatchHeader(socwatch_targets)
 
-        for block in hobl_data :
-            # etl_block = None
-            
-            if picks['only_picks'] is False :
-                # Todo
-                print("every data goes into the CSV")
-            elif "power_obj" in block and "picked" in block["power_obj"]:
+    header = ['name']  
+    socwatch_header_dict = soc.getSocwatchHeader(socwatch_targets)
 
-                if "ETL" in block["data_type"] :
-                    etl_handler(block)
-                elif  "socwatch_obj" in block:
-                    socwatch_handler(block, socwatch_targets, socwatch_header_dict)
-                else :
-                    data_line = [block["data_label"]]
-                    power_output_handler(data_line, block, header)
-
-                    similar_model = None
-                    for index in range(len(data_lines)-1, -1, -1):
-                        if data_lines[index][0].find(data_line[0]) >= 0:
-                            similar_model = index
-                            break
-                    if similar_model is not None :
-                        data_lines.insert(similar_model+1, data_line)
-                    else : 
-                        data_lines.append(data_line)
-
-        socwatch_header = getSocwatchHeaderList(socwatch_header_dict)
-        header.extend(socwatch_header)
-        data_lines.insert(0, header)
-
-        if picks['data_direction'] == 'vertical':
-            convertToVerticalData()
-            writer.writerows(data_vertical)
-        else :
-            writer.writerows(data_lines)
+    for block in hobl_data :
+        # etl_block = None
         
-        # writer.writerows(data_lines)
+        if picks['only_picks'] is False :
+            # Todo
+            print("every data goes into the CSV")
+        elif "power_obj" in block and "picked" in block["power_obj"]:
+
+            if "ETL" in block["data_type"] :
+                etl_handler(block)
+            elif  "socwatch_obj" in block:
+                socwatch_handler(block, socwatch_targets, socwatch_header_dict)
+            else :
+                data_line = [block["data_label"]]
+                power_output_handler(data_line, block, header)
+
+                similar_model = None
+                for index in range(len(data_lines)-1, -1, -1):
+                    if data_lines[index][0].find(data_line[0]) >= 0:
+                        similar_model = index
+                        break
+                if similar_model is not None :
+                    data_lines.insert(similar_model+1, data_line)
+                else : 
+                    data_lines.append(data_line)
+
+    socwatch_header = getSocwatchHeaderList(socwatch_header_dict)
+    header.extend(socwatch_header)
+    data_lines.insert(0, header)
+    
+
+    with open(file_path+"_horizontal.csv", 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerows(data_lines)
+    
+    with open(file_path+"_vertical.csv", 'w', newline='') as file:
+        writer = csv.writer(file)
+        convertToVerticalData()
+        writer.writerows(data_vertical)
+
 
         
 
