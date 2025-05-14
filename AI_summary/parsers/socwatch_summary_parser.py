@@ -44,8 +44,8 @@ def coreFreqResidencyTable(table):
         try :
             # print(row[1], (float(row[2])+float(row[3])+float(row[4])+float(row[5]))/4, (float(row[6])+float(row[7])+float(row[8])+float(row[9]))/4)
             key = "-".join(row[1].split(" -- "))
-            pcore = (float(row[2])+float(row[3])+float(row[4])+float(row[5]))/4
-            ecore = (float(row[6])+float(row[7])+float(row[8])+float(row[9]))/4
+            pcore = (float(row[2])+float(row[3])+float(row[4])+float(row[5]))
+            ecore = (float(row[6])+float(row[7])+float(row[8])+float(row[9]))
             data[key] = [round(pcore, 3), round(ecore, 3)]
         except :
             print("=== error in coreFreqResidencyTable ===", table)

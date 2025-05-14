@@ -102,7 +102,7 @@ MED = "MED"
 
 
 #BASE = os.getcwd()
-BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data"
+BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\full_data"
 
 #result_list_csv = f"{BA}\\file_list.csv"
 result_csv = f"{BASE}\\AI_models_parsed_results"

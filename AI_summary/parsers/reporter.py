@@ -106,6 +106,7 @@ def writeParsedInCSV(file_path, hobl_data, socwatch_targets, picks) :
 
     header = ['name']  
     socwatch_header_dict = soc.getSocwatchHeader(socwatch_targets)
+    socwatch_blocks = list()
 
     for block in hobl_data :
         # etl_block = None
@@ -118,7 +119,8 @@ def writeParsedInCSV(file_path, hobl_data, socwatch_targets, picks) :
             if "ETL" in block["data_type"] :
                 etl_handler(block)
             elif  "socwatch_obj" in block:
-                socwatch_handler(block, socwatch_targets, socwatch_header_dict)
+                socwatch_blocks.append(block)
+                # socwatch_handler(block, socwatch_targets, socwatch_header_dict)
             else :
                 data_line = [block["data_label"]]
                 power_output_handler(data_line, block, header)
@@ -132,6 +134,10 @@ def writeParsedInCSV(file_path, hobl_data, socwatch_targets, picks) :
                     data_lines.insert(similar_model+1, data_line)
                 else : 
                     data_lines.append(data_line)
+    
+    for block in socwatch_blocks :
+        socwatch_handler(block, socwatch_targets, socwatch_header_dict)
+    
 
     socwatch_header = getSocwatchHeaderList(socwatch_header_dict)
     header.extend(socwatch_header)
