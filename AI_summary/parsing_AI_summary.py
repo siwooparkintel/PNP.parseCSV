@@ -14,6 +14,7 @@ import argparse
 
 parser = argparse.ArgumentParser(prog='AI summary parser')
 parser.add_argument('-i', '--input', help='input path. this will be the bese of the summray, will detect all files and folders from that path tree')
+parser.add_argument('-o', '--output', help='output path. location of file and file name')
 # parser.print_help()
 args = parser.parse_args()
 print("args: ", args)
@@ -111,12 +112,12 @@ MED = "MED"
 #BASE = os.getcwd()
 # BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data"
 BASE = args.input
+result_csv = args.output
 
 
 
-
-#result_list_csv = f"{BA}\\file_list.csv"
-result_csv = f"{BASE}\\AI_models_parsed_results"
+if result_csv == None : 
+    result_csv = f"{BASE}\\AI_models_summary"
 
 
 
