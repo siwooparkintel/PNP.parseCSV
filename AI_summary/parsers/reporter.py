@@ -10,11 +10,11 @@ data_vertical = []
 
 
 
-def queryData(data_label) :
+def queryData(data_label_list) :
     data_line = None
     for line_index in range(len(data_lines)-1, -1, -1):
         line = data_lines[line_index]
-        if data_label == line[0] :
+        if data_label_list[0] == line[0] and data_label_list[1] == line[1] :
             data_line = line
             break
     return data_line
@@ -104,7 +104,7 @@ def getSocwatchHeaderList(soc_dict) :
 def writeParsedInCSV(file_path, hobl_data, socwatch_targets, picks) :
     
 
-    header = ['name']  
+    header = ['Condition', 'Name']  
     socwatch_header_dict = soc.getSocwatchHeader(socwatch_targets)
     socwatch_blocks = list()
 
@@ -122,16 +122,16 @@ def writeParsedInCSV(file_path, hobl_data, socwatch_targets, picks) :
                 socwatch_blocks.append(block)
                 # socwatch_handler(block, socwatch_targets, socwatch_header_dict)
             else :
-                data_line = [block["data_label"]]
+                data_line = [block["data_label"][0], block["data_label"][1]]
                 power_output_handler(data_line, block, header)
 
-                similar_model = None
+                similar_model_index = None
                 for index in range(len(data_lines)-1, -1, -1):
-                    if data_lines[index][0].find(data_line[0]) >= 0:
-                        similar_model = index
+                    if data_lines[index][1].find(data_line[1]) >= 0:
+                        similar_model_index = index
                         break
-                if similar_model is not None :
-                    data_lines.insert(similar_model+1, data_line)
+                if similar_model_index is not None :
+                    data_lines.insert(similar_model_index+1, data_line)
                 else : 
                     data_lines.append(data_line)
     
@@ -144,11 +144,11 @@ def writeParsedInCSV(file_path, hobl_data, socwatch_targets, picks) :
     data_lines.insert(0, header)
     
 
-    with open(file_path+"_horizontal.csv", 'w', newline='') as file:
+    with open(file_path+"_"+data_lines[1][0]+"_horizontal.csv", 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_lines)
     
-    with open(file_path+"_vertical.csv", 'w', newline='') as file:
+    with open(file_path+"_"+data_lines[1][0]+"_vertical.csv", 'w', newline='') as file:
         writer = csv.writer(file)
         convertToVerticalData()
         writer.writerows(data_vertical)

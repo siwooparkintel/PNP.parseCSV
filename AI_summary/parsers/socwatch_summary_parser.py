@@ -10,7 +10,7 @@ def cpuModelTable(table) :
     for line in copied:
         items = line[0].split("=")
         if len(items) > 1 :
-            key = items[0].split("/")[1]
+            key = items[0].split("/")[1].strip()
             data[key] = items[-1].strip()
     table['table_data'] = data
 
@@ -35,21 +35,49 @@ def bwTotalAvr(table) :
     # table['table_data'] = {table['table_data'][0][2]:table['table_data'][num-1][2]}
     table['table_data'] = {table['label']+"_AvrRt(MB/s)":table['table_data'][num-1][2]}
 
-def coreFreqResidencyTable(table):
+def coreFreqResidencyTable(table, core_type_dict):
     copied = table['table_data'].copy()
-    data = {copied[0][0]:['LNC','SKT']}
-    for index in range(1, len(copied)-1, 1) :
+    header_start = copied[0][0]
+    data = {header_start:[]}
+    if core_type_dict is not None :
+        for TYPE in core_type_dict : 
+            core_name = core_type_dict[TYPE]
+            if core_name not in data[header_start]:
+                data[header_start].append(core_name)
+    # print("=== in coreFreqResidencyTable: ", header_start, core_type_dict)
+
+    header = copied[0][2:]
+    top_bin = copied[1][2:]
+    
+    for index in range(1, len(copied), 1) :  # this is exccluding freq 0, idle. : for index in range(1, len(copied)-1, 1) :
         row = copied[index]
-        # print("==================", row)
-        try :
-            # print(row[1], (float(row[2])+float(row[3])+float(row[4])+float(row[5]))/4, (float(row[6])+float(row[7])+float(row[8])+float(row[9]))/4)
-            key = "-".join(row[1].split(" -- "))
-            pcore = (float(row[2])+float(row[3])+float(row[4])+float(row[5]))
-            ecore = (float(row[6])+float(row[7])+float(row[8])+float(row[9]))
-            data[key] = [round(pcore, 3), round(ecore, 3)]
-        except :
-            print("=== error in coreFreqResidencyTable ===", table)
-            data[key] = None
+        line_dict = dict()
+        line_data_only = row[2:]
+        # print(row, line_data_only)
+        key = "-".join(row[1].split(" -- "))
+        if key == "0" : 
+            key = "0-idle"
+        for cell_idx in range(len(line_data_only)) :
+            column_cpu = header[cell_idx].split("/")[2]
+            # print("==== ", column_cpu, core_type_dict)
+            # print(column_cpu in core_type_dict, "(msec)" not in header[cell_idx], top_bin[cell_idx])
+            if column_cpu in core_type_dict and "(msec)" not in header[cell_idx] and int(float(top_bin[cell_idx])) != 100: 
+                core_name = core_type_dict[column_cpu]
+                if core_name not in line_dict :
+                    line_dict[core_name] = float(line_data_only[cell_idx])
+                    line_dict[core_name+"_num"] = 1
+                else :
+                    line_dict[core_name] += float(line_data_only[cell_idx])
+                    line_dict[core_name+"_num"] += 1
+        # print("line_dict: ", line_dict)
+        sum_list = ["-"] * len(data[header_start])
+        for core_idx in range(len(data[header_start])) :    
+            core_name = data[header_start][core_idx]
+            if core_name in line_dict:
+                sum_list[core_idx] = round(line_dict[core_name] / line_dict[core_name+"_num"], 2)
+        data[key] = sum_list.copy()
+        # print(key, data[key])
+        # print(line_data_only)
     table['table_data'] = data
 
 def coreFreqAvrTable(table, keyIdx, ValueIdx):
@@ -100,18 +128,20 @@ def defaultResidencyTable(table, keyIdx, ValueIdx) :
         data[key] = line[ValueIdx]
     table['table_data'] = data
 
-def socwatchTableTypeChecker(table) :
+
+def socwatchTableTypeChecker(table, core_type) :
+
     label = table['label']
-    if label == 'Core_Cstate' or label == 'ACPI_Cstate' : 
+    if label == 'CPU_model':
+        cpuModelTable(table)
+    elif label == 'Core_Cstate' or label == 'ACPI_Cstate' : 
         coreResidencyTable(table)
     elif label == 'OS_wakeups':
         osWakeupsTable(table)
     elif label == 'CPU_Pavr' : 
         coreFreqAvrTable(table, 0, 1)
     elif label == 'CPU_Pstate' : 
-        coreFreqResidencyTable(table)
-    elif label == 'CPU_model':
-        cpuModelTable(table)
+        coreFreqResidencyTable(table, core_type)
     elif label == 'DC_count':
         oneLineColonSeperater(table)
     elif label == 'DDR_BW' or label == 'IO_BW' or label == 'VC1_BW' or label == 'NPU_BW' or label == 'Media_BW' or label == 'IPU_BW' or label == 'CCE_BW' or label == 'GT_BW' or label == 'D2D_BW':
@@ -141,7 +171,7 @@ def parseSocwatch(abs_path, socwatch_targets) :
     socwatch_obj['socwatch_path'] = abs_path
     socwatch_obj['socwatch_tables'] = []
     socwatch_obj['core_number'] = 0
-
+    CORE_TYPE = None
     with open(abs_path, 'r') as file:
 
         for target in socwatch_targets : 
@@ -153,12 +183,13 @@ def parseSocwatch(abs_path, socwatch_targets) :
                     # if the table_data is initiated, 'isCompleted' exists, keep collecting line until empty line comes
                     if tline == "" :
                         tTable['isCompleted'] = True
-                        socwatchTableTypeChecker(tTable)
+                        socwatchTableTypeChecker(tTable, CORE_TYPE)
                         extractHeader(tTable)
                         socwatch_obj['socwatch_tables'].append(tTable)
+
                         # need to re-write this portion
                         if tTable['label'] == 'CPU_model':
-                            socwatch_obj['core_number'] = len(tTable['table_data'])
+                            CORE_TYPE = tTable['table_data'].copy()
                         break
                     else :
                         line_list = [item.strip() for item in tline.split(',')]

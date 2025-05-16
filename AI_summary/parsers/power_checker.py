@@ -45,13 +45,13 @@ def sortAndPick(objs, picks) :
     # print("+++++++++++++++++++++++++++", sorted_etls, sorted_powers, sorted_socwatches)
 
 
-def pullSameLabel(whole_sets, label) :
+def pullSameLabel(whole_sets, full_data_label) :
 
     power_list = list()
 
     for block in whole_sets:
-
-        if label == block["data_label"] and 'power_obj' in block and "power_data" in block['power_obj'] : # and not ("ETL" in block["data_type"] or "SOCWATCH" in block["data_type"])
+        
+        if full_data_label == " ".join(block["data_label"]) and 'power_obj' in block and "power_data" in block['power_obj'] : # and not ("ETL" in block["data_type"] or "SOCWATCH" in block["data_type"])
             temp = block["data_type"].copy()
             temp.sort()
             block["power_obj"]["power_type"] = "_".join(temp)
@@ -66,10 +66,10 @@ def checkAndMarkPower(whole_sets, picks) :
     done_model = set()
 
     for obj in whole_sets:
-        
-        if obj["data_label"] not in done_model:
-            done_model.add(obj["data_label"])
-            objs = pullSameLabel(whole_sets, obj["data_label"])
+        full_data_label = " ".join(obj["data_label"])
+        if full_data_label not in done_model:
+            done_model.add(full_data_label)
+            objs = pullSameLabel(whole_sets, full_data_label)
             if picks['only_picks'] is True:
                 sortAndPick(objs, picks)
             
