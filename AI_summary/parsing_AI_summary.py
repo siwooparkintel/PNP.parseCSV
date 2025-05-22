@@ -7,6 +7,7 @@ import parsers.tools as tools
 import parsers.model_output_parser as mop
 import parsers.socwatch_summary_parser as soc
 import parsers.power_summary_parser as psp
+import parsers.power_trace_parser as ptp
 import parsers.power_checker as pck
 import parsers.reporter as rpt
 
@@ -64,30 +65,30 @@ AI_parsing_items = [
 ]
 
 DAQ_target = {
-"V_VAL_VCC_PCORE":0,
-"I_VAL_VCC_PCORE":0,
-"V_VAL_VCC_ECORE":0,
-"I_VAL_VCC_ECORE":0,
-"V_VAL_VCCSA":0,
-"I_VAL_VCCSA":0,
-"V_VAL_VCCGT":0,
-"I_VAL_VCCGT":0,
-"P_VCC_PCORE":0,
-"P_VCC_ECORE":0,
-"P_VCCSA":0,
-"P_VCCGT":0,
-"P_VCCL2":0,
-"P_VCC1P8":0,
-"P_VCCIO":0,
-"P_VCCDDRIO":0,
-"P_VNNAON":0,
-"P_VNNAONLV":0,
-"P_VDDQ":0,
-"P_VDD2H":0,
-"P_VDD2L":0,
-"P_V1P8U_MEM":0,
-"P_SOC+MEMORY":0,
-"Run Time":0
+"V_VAL_VCC_PCORE":-1,
+"I_VAL_VCC_PCORE":-1,
+"V_VAL_VCC_ECORE":-1,
+"I_VAL_VCC_ECORE":-1,
+"V_VAL_VCCSA":-1,
+"I_VAL_VCCSA":-1,
+"V_VAL_VCCGT":-1,
+"I_VAL_VCCGT":-1,
+"P_VCC_PCORE":-1,
+"P_VCC_ECORE":-1,
+"P_VCCSA":-1,
+"P_VCCGT":-1,
+"P_VCCL2":-1,
+"P_VCC1P8":-1,
+"P_VCCIO":-1,
+"P_VCCDDRIO":-1,
+"P_VNNAON":-1,
+"P_VNNAONLV":-1,
+"P_VDDQ":-1,
+"P_VDD2H":-1,
+"P_VDD2L":-1,
+"P_V1P8U_MEM":-1,
+"P_SOC+MEMORY":-1,
+"Run Time":-1
 }
 
 
@@ -97,6 +98,7 @@ CL_OUTPUT = '_output.txt'
 CL_SOCWATCH = 'Session.etl'
 CL_AI_MODEL = '_qdq_proxy_'
 CL_DAQ_SUMMARY = 'pacs-summary.csv'
+CL_DAQ_TRACES = 'pacs-traces'
 CL_PASS = ".PASS"
 
 ETL = "ETL"
@@ -143,7 +145,7 @@ To parse every POWER_SOCWATCH
 '''
 # data_direction : 'vertical' or 'horizontal'
 
-picks = {'only_picks':True, 'power_pick':MED, 'data_direction':'vertical'}
+picks = {'only_picks':True, 'power_pick':MED, 'data_direction':'vertical', 'inferencing_power':True}
 
 
 
@@ -218,6 +220,14 @@ def add_power(abs_path):
     global file_num
     file_num += 1
 
+def add_trace(abs_path):
+    path_set = tools.splitLastItem(abs_path, "\\", 1)
+    dataset = pullData(path_set[0])
+    if dataset == None:
+        tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
+    dataset["trace_obj"] = ptp.parsePowerTraceCSV(abs_path)
+    global file_num
+    file_num += 1
 
 def add_socwatch(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
@@ -248,6 +258,9 @@ def fileClassifier(abs_path, f):
     elif f.find(CL_DAQ_SUMMARY) >= 0:
         add_power(abs_path)
         file_type = CL_DAQ_SUMMARY
+    elif f.find(CL_DAQ_TRACES) >= 0 and f.find('sr.csv') >= 0:
+        add_trace(abs_path)
+        file_type = CL_DAQ_TRACES
     elif f.find(CL_SOCWATCH) >= 0:
         workload_name = tools.splitLastItem(f, "_", 1)[0]
         upto_path = tools.splitLastItem(abs_path, "\\", 1)[0]
@@ -280,12 +293,14 @@ def main():
 
     detectAndParseFile(BASE)
     pck.checkAndMarkPower(hobl_sets, picks)
+    if (picks["inferencing_power"] == True) : 
+        ptp.averageInferencingPower(hobl_sets, DAQ_target)
     # ===========================================================================
     # print processed(fully parsed) data to check the dictionary (Object) structure
     # since it is keep improving, changing
     # ===========================================================================
-    # print("====[hobl_sets]", hobl_sets)
-    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, picks)
+    print("====[hobl_sets]", hobl_sets)
+    # rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, picks)
 
 
 start_time = time.perf_counter()
