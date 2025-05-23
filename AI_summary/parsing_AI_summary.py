@@ -49,7 +49,6 @@ socwatch_targets = [
     {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-2049", "2050"]}
 ]
 
-
 AI_parsing_items = [
     {"key": "read_model", "lookup": "[ INFO ] Read model took", "unit":"ms"},
     {"key": "compile_model", "lookup": "[ INFO ] Compile model took", "unit":"ms"},
@@ -143,9 +142,8 @@ To parse every POWER_SOCWATCH
 
 ====================================================================================
 '''
-# data_direction : 'vertical' or 'horizontal'
 
-picks = {'only_picks':True, 'power_pick':MED, 'data_direction':'vertical', 'inferencing_power':True}
+picks = {'power_pick':MED}
 
 
 
@@ -293,14 +291,14 @@ def main():
 
     detectAndParseFile(BASE)
     pck.checkAndMarkPower(hobl_sets, picks)
-    if (picks["inferencing_power"] == True) : 
-        ptp.averageInferencingPower(hobl_sets, DAQ_target)
+    # if (picks["inferencing_power"] is True) : 
+    # ptp.averageInferencingPower(hobl_sets, DAQ_target)
     # ===========================================================================
     # print processed(fully parsed) data to check the dictionary (Object) structure
     # since it is keep improving, changing
     # ===========================================================================
-    print("====[hobl_sets]", hobl_sets)
-    # rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, picks)
+    # print("====[hobl_sets]", hobl_sets)
+    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, DAQ_target)
 
 
 start_time = time.perf_counter()
@@ -322,49 +320,20 @@ print(f"Parsing {file_num} files Successful! [Elapsed time:::] {elapsed_time} se
 
 
 """
-{
-    'ID_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004',
-    'data_label': ['NPU', 'Model_C2_v1_2_1_qdq_proxy'], 
-    'data_type': ['POWER', 'SOCWATCH'], 
-    'power_obj': {'power_data': {'V_VAL_VCC_PCORE': 0.747903, 'I_VAL_VCC_PCORE': 0.991634, 'V_VAL_VCC_ECORE': 0.279867, 'I_VAL_VCC_ECORE': 0.039626, 'V_VAL_VCCSA': 1.104632, 'I_VAL_VCCSA': 5.497834, 'V_VAL_VCCGT': 0.000573, 'I_VAL_VCCGT': -0.000137, 'P_VCC_PCORE': 0.936324, 'P_VCC_ECORE': 0.02296, 'P_VCCSA': 6.644626, 'P_VCCGT': 3.4e-05, 'P_VCCL2': 0.001612, 'P_VCC1P8': 0.069989, 'P_VCCIO': 0.396728, 'P_VCCDDRIO': 0.152057, 'P_VNNAON': 0.193041, 'P_VNNAONLV': 0.013124, 'P_VDDQ': 0.076898, 'P_VDD2H': 1.004154, 'P_VDD2L': 0.002397, 'P_V1P8U_MEM': 0.059089, 'P_SOC+MEMORY': 9.579855, 'Run Time': 25.4, 'Energy (J)': 243.328317, 'Eng(J)/Frame': 0.13881709253966354}, 'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004_pacs-summary.csv', 'power_type': 'POWER_SOCWATCH', 'picked': 'picked'}, 
-    'model_output_obj': {'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004\\NPU_Model_C2_v1_2_1_qdq_proxy_output.txt', 'model_output_data': {'read_model': [26.19, 'ms'], 'compile_model': [44.46, 'ms'], 'start_mem_usage': [126708.0, 'KB'], 'end_mem_usage': [145232.0, 'KB'], 'ram_used': [18524.0, 'KB'], 'first_inference': [9.73, 'ms'], 'device': ['NPU', ''], 'iterations': [35058.0, ''], 'duration': [20000.36, 'ms'], 'latency_median': [0.56, 'ms'], 'throughput': [1752.87, 'FPS']}, 'model_output_status': 'successful'}, 
-    'socwatch_obj': {
-        'socwatch_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_004\\socwatch\\AI_NPU_model_stripped.csv', 'socwatch_tables': [
-            {'label': 'CPU_model', 'table_data': {'Core_0 ': 'LNC', 'Core_1 ': 'LNC', 'Core_2 ': 'LNC', 'Core_3 ': 'LNC', 'Core_4 ': 'SKT', 'Core_5 ': 'SKT', 'Core_6 ': 'SKT', 'Core_7 ': 'SKT'}, 'isCompleted': True}, 
-            {'label': 'PKG_Cstate', 'table_data': {'C-State': 'Package Residency (%)', 'PC0': '68.54', 'PC2': '1.79', 'PC6.1': '0.00', 'PC6.2': '0.21', 'PC10.1': '0.15', 'PC10.2': '29.31', 'PC10.3': '0.00'}, 'isCompleted': True}, 
-            {'label': 'Core_Cstate', 'table_data': {'C-State': 'CC0', 'Core_0 Residency (%)': '9.84', 'Core_1 Residency (%)': '10.45', 'Core_2 Residency (%)': '3.97', 'Core_3 Residency (%)': '5.61', 'Core_4 Residency (%)': '0.27', 'Core_5 Residency (%)': '0.11', 'Core_6 Residency (%)': '0.07', 'Core_7 Residency (%)': '0.09'}, 'isCompleted': True}, 
-            {'label': 'ACPI_Cstate', 'table_data': {'C-State': 'ACPI C0', 'Core_0 Residency (%)': '7.93', 'Core_1 Residency (%)': '8.62', 'Core_2 Residency (%)': '3.54', 'Core_3 Residency (%)': '4.66', 'Core_4 Residency (%)': '0.57', 'Core_5 Residency (%)': '0.14', 'Core_6 Residency (%)': '0.11', 'Core_7 Residency (%)': '0.11'}, 'isCompleted': True}, 
-            {'label': 'OS_wakeups', 'table_data': {'OS_wakeups': 'Process (CPU %)', 'Rank': 'Overall (11.56)', '1': 'benchmark_app.exe (6.63)', '2': 'System (3.59)', '3': 'socwatch.exe (0.69)', '4': 'MsMpEng.exe (0.44)', '5': 'SimpleRemoteConsole.exe (0.24)'}, 'isCompleted': True}, 
-            {'label': 'CPU_Pavr', 'table_data': {'CPU ID': 'Average (MHz)', 'Core_0': '1542', 'Core_1': '2015', 'Core_2': '1684', 'Core_3': '1324', 'Core_4': '1816', 'Core_5': '2450', 'Core_6': '2072', 'Core_7': '2081'}, 'isCompleted': True}, 
-            {'label': 'CPU_Pstate', 'table_data': {
-                'P-State': ['LNC', 'SKT'], 
-                '5001-5100': [0.0, 0.0], 
-                '4901-5000': [0.0, 0.0], 
-                '4801-4900': [0.15, 0.0], 
-                '4701-4800': [0.09, 0.0], '4601-4700': [0.0, 0.0], '4501-4600': [0.13, 0.0], '4401-4500': [0.16, 0.0], '4301-4400': [0.24, 0.0], '4201-4300': [0.0, 0.0], '4101-4200': [0.22, 0.0], '4001-4100': [0.06, 0.0], '3901-4000': [0.1, 0.0], '3801-3900': [0.28, 0.0], '3701-3800': [0.22, 0.0], '3601-3700': [0.16, 0.0], '3501-3600': [0.14, 0.0], '3401-3500': [0.04, 0.02], '3301-3400': [0.0, 0.05], '3201-3300': [0.38, 0.07], '3101-3200': [0.0, 0.0], '3001-3100': [0.01, 0.03], '2901-3000': [0.0, 0.01], '2801-2900': [0.26, 0.01], '2701-2800': [0.06, 0.0], '2601-2700': [0.21, 0.0], '2501-2600': [0.12, 0.0], '2401-2500': [0.39, 0.01], '2301-2400': [0.35, 0.01], '2201-2300': [0.98, 0.0], '2101-2200': [1.39, 0.03], '2001-2100': [0.32, 0.0], '1901-2000': [0.88, 0.05], '1801-1900': [0.59, 0.02], '1701-1800': [0.7, 0.01], '1601-1700': [1.96, 0.01], '1501-1600': [1.09, 0.01], '1401-1500': [2.09, 0.16], '1301-1400': [2.92, 0.01], '1201-1300': [5.29, 0.02], '1101-1200': [5.02, 0.04], '1001-1100': [1.86, 0.04], '901-1000': [0.22, 0.0], '801-900': [0.08, 0.0], '701-800': [0.08, 0.0], '601-700': [0.06, 0.0], '501-600': [0.02, 0.0], 
-                '401-500': [0.0, 0.0], 
-                '<= 400': [0.0, 0.0]}, 
-            'isCompleted': True}, 
-            {'label': 'RC_Cstate', 'table_data': {'C-State': 'iGPU/Graphics Residency (%)', 'RC0': '0.17', 'RC6': '99.83'}, 'isCompleted': True}, 
-            {'label': 'DDR_BW', 'table_data': {'DDR_BW_AvrRt(MB/s)': '14650.70'}, 'isCompleted': True}, 
-            {'label': 'IO_BW', 'table_data': {'IO_BW_AvrRt(MB/s)': '6.78'}, 'isCompleted': True}, 
-            {'label': 'VC1_BW', 'table_data': {'VC1_BW_AvrRt(MB/s)': '2.05'}, 'isCompleted': True}, 
-            {'label': 'NPU_BW', 'table_data': {'NPU_BW_AvrRt(MB/s)': '14660.05'}, 'isCompleted': True}, 
-            {'label': 'Media_BW', 'table_data': {'Media_BW_AvrRt(MB/s)': '0.00'}, 'isCompleted': True}, 
-            {'label': 'IPU_BW', 'table_data': {'IPU_BW_AvrRt(MB/s)': '0.00'}, 'isCompleted': True}, 
-            {'label': 'CCE_BW', 'table_data': {'CCE_BW_AvrRt(MB/s)': '0.00'}, 'isCompleted': True}, 
-            {'label': 'GT_BW', 'table_data': {'GT_BW_AvrRt(MB/s)': '0.25'}, 'isCompleted': True}, 
-            {'label': 'D2D_BW', 'table_data': {'D2D_BW_AvrRt(MB/s)': '4.66'}, 'isCompleted': True}, 
-            {'label': 'CPU_temp', 'table_data': {'CPU_temp': 'Time-weighted Avg (oC)', 'Core_0': '30.56', 'Core_1': '30.28', 'Core_2': '30.09', 'Core_3': '29.70', 'Core_4': '29.96', 'Core_5': '29.97', 'Core_6': '30.21', 'Core_7': '30.11'}, 'isCompleted': True}, 
-            {'label': 'SoC_temp', 'table_data': {'SoC_temp': 'Time-weighted Avg (oC)', 'PCH': '30.03', 'SA': '32.18', 'IPU': '28.87', 'DE': '30.05', 'NPU': '32.05', 'MEDIA': '29.62'}, 'isCompleted': True}, 
-            {'label': 'NPU_Dstate', 'table_data': {'State': 'Residency (%)', 'D0i3/D3': '41.00', 'D0 Active': '58.17', 'D0i2 Active': '0.00', 'D0i2 Idle': '0.83'}, 'isCompleted': True}, 
-            {'label': 'DC_count', 'table_data': {'Up to DC5 or DC6 enabled (sampled count)': '293', 'Up to DC5 enabled (sampled count)': '0', 'Up to DC6 (including DC5) enabled (sampled count)': '293', 'DCx Clock-Off(DCxCO) state allowed by software': 'Do not allow'}, 'isCompleted': True}, 
-            {'label': 'Media_Cstate', 'table_data': {'C-State': 'Residency (%)', 'Media-C0': '7.17', 'Media C6': '92.83'}, 'isCompleted': True}, 
-            {'label': 'NPU_Pstate', 'table_data': {'Frequency (MHz)': 'NPU (%)', '0': '41.97', '1950': '0.48', '2450': '0.28', '2950': '0.32', '3500': '0.32', '3900': '56.63'}, 'isCompleted': True}, 
-            {'label': 'MEMSS_Pstate', 'table_data': {'Frequency (MHz)': 'MEMSS (%)', '594': '42.49', '1584': '0.69', '2112': '56.82'}, 'isCompleted': True}, 
-            {'label': 'NoC_Pstate', 'table_data': {'Frequency (MHz)': 'NOC (%)', '400': '41.97', '650': '1.08', '1050': '56.96'}, 'isCompleted': True}, 
-            {'label': 'iGFX_Pstate', 'table_data': {'Frequency (MHz)': 'IGFX (%)', '0': '99.79', '400': '0.21'}, 'isCompleted': True}
-        ], 
-    'core_number': 8}}, 
+{'ID_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_F2_v0_4_4_qdq_proxy\\AI_NPU_model_stripped_004', 
+'data_label': ['NPU', 'Model_F2_v0_4_4_qdq_proxy'], 
+'data_type': ['POWER', 'SOCWATCH'], 
+'power_obj': {
+    'power_data': {'V_VAL_VCC_PCORE': 0.76217, 'I_VAL_VCC_PCORE': 2.14678, 'V_VAL_VCC_ECORE': 0.475404, 'I_VAL_VCC_ECORE': 0.098678, 'V_VAL_VCCSA': 0.787285, 'I_VAL_VCCSA': 0.386974, 'V_VAL_VCCGT': 0.0004, 'I_VAL_VCCGT': 0.000534, 'P_VCC_PCORE': 2.688818, 'P_VCC_ECORE': 0.072746, 'P_VCCSA': 0.336365, 'P_VCCGT': 0.000185, 'P_VCCL2': 0.003397, 'P_VCC1P8': 0.058457, 'P_VCCIO': 0.19741, 'P_VCCDDRIO': 0.023355, 'P_VNNAON': 0.122273, 'P_VNNAONLV': 0.010247, 'P_VDDQ': 0.007298, 'P_VDD2H': 0.224843, 'P_VDD2L': 0.003114, 'P_V1P8U_MEM': 0.014811, 'P_SOC+MEMORY': 3.764242, 'Run Time': 7.8, 'Energy (J)': 29.361087599999998, 'Eng(J)/Frame': 'n/a'},
+    'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_F2_v0_4_4_qdq_proxy\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004_pacs-summary.csv',
+    'power_type': 'POWER_SOCWATCH', 
+    'picked': 'picked'}, 
+'trace_obj': {'trace_data': None, 'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_F2_v0_4_4_qdq_proxy\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004\\AI_NPU_model_stripped_004_pacs-traces-100sr.csv'},
+'model_output_obj': {
+    'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_F2_v0_4_4_qdq_proxy\\AI_NPU_model_stripped_004\\NPU_Model_F2_v0_4_4_qdq_proxy_output.txt', 'model_output_data': {'read_model': [52.26, 'ms'], 'compile_model': [None, ''], 'start_mem_usage': [None, ''], 'end_mem_usage': [None, ''], 'ram_used': [None, ''], 'first_inference': [None, ''], 'device': [None, ''], 'iterations': [None, ''], 'duration': [None, ''], 'latency_median': [None, ''], 'throughput': [None, '']}, 'model_output_status': 'failed'},
+'socwatch_obj': {
+    'socwatch_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_F2_v0_4_4_qdq_proxy\\AI_NPU_model_stripped_004\\socwatch\\AI_NPU_model_stripped.csv',
+    'socwatch_tables': [{'label': 'CPU_model', 'table_data': {'Core_0': 'LNC', 'Core_1': 'LNC', 'Core_2': 'LNC', 'Core_3': 'LNC', 'Core_4': 'SKT', 'Core_5': 'SKT', 'Core_6': 'SKT', 'Core_7': 'SKT'}, 'isCompleted': True}, {'label': 'PKG_Cstate', 'table_data': {'C-State': 'Package Residency (%)', 'PC0': '65.63', 'PC2': '2.96', 'PC6.1': '0.00', 'PC6.2': '0.14', 'PC10.1': '0.13', 'PC10.2': '31.14', 'PC10.3': '0.00'}, 'isCompleted': True}, {'label': 'Core_Cstate', 'table_data': {'C-State': 'CC0', 'Core_0 Residency (%)': '6.32', 'Core_1 Residency (%)': '13.64', 'Core_2 Residency (%)': '4.67', 'Core_3 Residency (%)': '3.79', 'Core_4 Residency (%)': '0.20', 'Core_5 Residency (%)': '0.13', 'Core_6 Residency (%)': '1.27', 'Core_7 Residency (%)': '1.06'}, 'isCompleted': True}, {'label': 'ACPI_Cstate', 'table_data': {'C-State': 'ACPI C0', 'Core_0 Residency (%)': '6.37', 'Core_1 Residency (%)': '12.54', 'Core_2 Residency (%)': '4.95', 'Core_3 Residency (%)': '3.60', 'Core_4 Residency (%)': '0.24', 'Core_5 Residency (%)': '0.15', 'Core_6 Residency (%)': '1.46', 'Core_7 Residency (%)': '1.40'}, 'isCompleted': True}, {'label': 'OS_wakeups', 'table_data': {'OS_wakeups': 'Process (CPU %)', 'Rank': 'Overall (19.95)', '1': 'System (6.05)', '2': 'benchmark_app.exe (5.31)', '3': 'WerFault.exe (4.44)', '4': 'socwatch.exe (1.16)', '5': 'MsMpEng.exe (1.14)'}, 'isCompleted': True}, {'label': 'CPU_Pavr', 'table_data': {'CPU ID': 'Average (MHz)', 'Core_0': '2896', 'Core_1': '3548', 'Core_2': '2742', 'Core_3': '3030', 'Core_4': '2579', 'Core_5': '1699', 'Core_6': '2664', 'Core_7': '2594'}, 'isCompleted': True}, {'label': 'CPU_Pstate', 'table_data': {'P-State': ['LNC', 'SKT'], '5001-5100': [1.13, 0.0], '4901-5000': [0.41, 0.0], '4801-4900': [0.28, 0.0], '4701-4800': [0.11, 0.0], '4601-4700': [0.38, 0.0], '4501-4600': [0.21, 0.0], '4401-4500': [0.17, 0.0], '4301-4400': [0.14, 0.0], '4201-4300': [0.08, 0.0], '4101-4200': [0.1, 0.0], '4001-4100': [0.09, 0.0], '3901-4000': [0.08, 0.0], '3801-3900': [0.2, 0.0], '3701-3800': [0.11, 0.0], '3601-3700': [0.07, 0.14], '3501-3600': [0.08, 0.05], '3401-3500': [0.04, 0.0], '3301-3400': [0.06, 0.0], '3201-3300': [0.02, 0.0], '3101-3200': [0.01, 0.01], '3001-3100': [0.04, 0.0], '2901-3000': [0.06, 0.0], '2801-2900': [0.08, 0.04], '2701-2800': [0.08, 0.2], '2601-2700': [0.0, 0.0], '2501-2600': [0.02, 0.01], '2401-2500': [0.08, 0.01], '2301-2400': [0.0, 0.01], '2201-2300': [0.04, 0.0], '2101-2200': [0.11, 0.0], '2001-2100': [0.02, 0.0], '1901-2000': [0.01, 0.01], '1801-1900': [0.08, 0.0], '1701-1800': [0.04, 0.01], '1601-1700': [0.01, 0.01], '1501-1600': [0.07, 0.01], '1401-1500': [0.55, 0.1], '1301-1400': [0.73, 0.03], '1201-1300': [0.6, 0.03], '1101-1200': [0.21, 0.01], '1001-1100': [0.13, 0.0], '901-1000': [0.1, 0.01], '801-900': [0.06, 0.01], '701-800': [0.01, 0.01], '601-700': [0.0, 0.0], '501-600': [0.0, 0.0], '401-500': [0.0, 0.0], '<= 400': [0.0, 0.0], '0-idle': [93.08, 99.3]}, 'isCompleted': True}, {'label': 'RC_Cstate', 'table_data': {'C-State': 'iGPU/Graphics Residency (%)', 'RC0': '0.20', 'RC6': '99.80'}, 'isCompleted': True}, {'label': 'DDR_BW', 'table_data': {'DDR_BW_AvrRt(MB/s)': '447.50'}, 'isCompleted': True}, {'label': 'IO_BW', 'table_data': {'IO_BW_AvrRt(MB/s)': '2.29'}, 'isCompleted': True}, {'label': 'VC1_BW', 'table_data': {'VC1_BW_AvrRt(MB/s)': '3.88'}, 'isCompleted': True}, {'label': 'NPU_BW', 'table_data': {'NPU_BW_AvrRt(MB/s)': '0.00'}, 'isCompleted': True}, {'label': 'Media_BW', 'table_data': {'Media_BW_AvrRt(MB/s)': '0.00'}, 'isCompleted': True}, {'label': 'IPU_BW', 'table_data': {'IPU_BW_AvrRt(MB/s)': '0.00'}, 'isCompleted': True}, {'label': 'CCE_BW', 'table_data': {'CCE_BW_AvrRt(MB/s)': '0.00'}, 'isCompleted': True}, {'label': 'GT_BW', 'table_data': {'GT_BW_AvrRt(MB/s)': '0.22'}, 'isCompleted': True}, {'label': 'D2D_BW', 'table_data': {'D2D_BW_AvrRt(MB/s)': '12.03'}, 'isCompleted': True}, {'label': 'CPU_temp', 'table_data': {'CPU_temp': 'Time-weighted Avg (oC)', 'Core_0': '28.15', 'Core_1': '29.19', 'Core_2': '27.95', 'Core_3': '28.22', 'Core_4': '26.86', 'Core_5': '26.83', 'Core_6': '26.96', 'Core_7': '27.02'}, 'isCompleted': True}, {'label': 'SoC_temp', 'table_data': {'SoC_temp': 'Time-weighted Avg (oC)', 'PCH': '27.56', 'SA': '27.77', 'IPU': '27.56', 'DE': '27.02', 'NPU': '26.56', 'MEDIA': '26.45'}, 'isCompleted': True}, {'label': 'NPU_Dstate', 'table_data': {'State': 'Residency (%)', 'D0i3/D3': '100.00', 'D0 Active': '0.00', 'D0i2 Active': '0.00', 'D0i2 Idle': '0.00'}, 'isCompleted': True}, {'label': 'DC_count', 'table_data': {'Up to DC5 or DC6 enabled (sampled count)': '178', 'Up to DC5 enabled (sampled count)': '0', 'Up to DC6 (including DC5) enabled (sampled count)': '178', 'DCx Clock-Off(DCxCO) state allowed by software': 'Do not allow'}, 'isCompleted': True}, {'label': 'Media_Cstate', 'table_data': {'C-State': 'Residency (%)', 'Media-C0': '8.30', 'Media C6': '91.70'}, 'isCompleted': True}, {'label': 'NPU_Pstate', 'table_data': {'Frequency (MHz)': 'NPU (%)', '0': '100.00'}, 'isCompleted': True}, {'label': 'MEMSS_Pstate', 'table_data': {'Frequency (MHz)': 'MEMSS (%)', '594': '91.25', '2112': '8.75'}, 'isCompleted': True}, {'label': 'NoC_Pstate', 'table_data': {'Frequency (MHz)': 'NOC (%)', '400': '100.00'}, 'isCompleted': True}, {'label': 'iGFX_Pstate', 'table_data': {'Frequency (MHz)': 'IGFX (%)', '0': '100.00'}, 'isCompleted': True}],
+'core_number': 0}}
 
-            """
+"""

@@ -86,16 +86,13 @@ def getInferencingStartReversed(target_power_reversed, target_rail, file_path) :
                 # print("== found inferencing start", file_path, target_rail, data_set, step_avr)
                 return data_set[0]
 
-
-                break
-
     if isInferencingFound == False :
         # print("======= not found: ", file_path, target_rail, data_set, step_avr)   
         return None                 
     
 # print("======================================")
 
-def getAveragePowerByRails(csv_list, time_scale, target_obj) :
+def getAveragePowerByRails(csv_list, time_scale, target_obj, throughput) :
     trace_data = dict()
     for rail in target_obj:
         # print("==== rail name: ", len(csv_list), rail, target_obj[rail])
@@ -106,15 +103,14 @@ def getAveragePowerByRails(csv_list, time_scale, target_obj) :
             rail_list = [float(line[rail_idx]) for line in csv_list]
             # if rail == "P_SOC+MEMORY" :
             #     print(rail, rail_list)
-            trace_data[rail] = sum(rail_list) / len(csv_list)
+            trace_data[rail] = round(sum(rail_list) / len(csv_list), 3)
             # print("==== ", rail, trace_obj[rail])
             # if rail == "P_SOC+MEMORY" :
 
-
     # print(trace_obj)
+    trace_data["Energy (J)"] = round(trace_data["Run Time"] * trace_data["P_SOC+MEMORY"], 3)
+    trace_data["Eng(J)/Frame"] = round(trace_data["Energy (J)"] / throughput, 3)
     return trace_data
-
-
 
 
 
@@ -130,7 +126,7 @@ def averageInferencingPower(hobl_data, DAQ_target) :
             trace_sampling_rate = getSamplingRate(block["trace_obj"]["file_path"])
             # in milliseconds. So 100 sampling rate, 1 row advance means 10 ms passed.
             time_scale = 1000 / trace_sampling_rate
-            
+
 
             with open(block["trace_obj"]["file_path"], encoding='utf-8-sig', newline='') as tracefile:
                 
@@ -158,9 +154,8 @@ def averageInferencingPower(hobl_data, DAQ_target) :
                 infer_start_idx = total_row_num - infer_duration_in_scale - infer_start_reversed
                 infer_end_idx = infer_start_idx + infer_duration_in_scale
 
-                block["trace_obj"]["trace_data"] = getAveragePowerByRails(csv_list[infer_start_idx:infer_end_idx], time_scale, target_obj)
-          
-
+                block["trace_obj"]["trace_data"] = getAveragePowerByRails(csv_list[infer_start_idx:infer_end_idx], time_scale, target_obj, block["model_output_obj"]["model_output_data"]["throughput"][0])
+                # print("========", block["trace_obj"]["trace_data"])
     # sub_slopes = list()
     # sub_deriv = list()
     # for infer_set in NPU_list :
@@ -170,55 +165,6 @@ def averageInferencingPower(hobl_data, DAQ_target) :
     # sorted_deriv = sorted(sub_deriv)
     # print("slopes: ", sorted_slopes, "    derivatives: ", sorted_deriv)
 
-
-                # # getting target index
-                # for power_rail_index in range(len(header)-1, -1, -1):
-                #     if header[power_rail_index] == "P_SOC+MEMORY":
-                #         target_idx = power_rail_index
-                #         break
-                
-                # for line in range(len(list(csvreader))-1, -1, -1):
-                #     target_power.append(line[target_idx])
-
-                
-                
-
-
-
-
-                # print(header)
-
-
-                # avr_index = -1
-                # try:
-                #     avr_index = fields.index(AVERAGE)
-                # except:
-                #     tools.errorAndExit(f"{AVERAGE} is NOT in the CSV header")
-
-                
-                # # print("=======", csvreader)
-                # for row in csvreader:
-                #     rows.append(row)
-
-                # power_len = len(rows)-1
-                # for target_rail in DAQ_target:
-                #     #print(type(rail), rail)
-                    
-                #     for power_rail_index in range(len(rows)-1, -1, -1):
-                #         t_rail = rows[power_rail_index]
-                #         # print(power_rail_index, type(rows[power_rail_index]), rows[power_rail_index], target_rail)
-                #         if t_rail[0]== target_rail:
-                #             power_data[target_rail] = float(t_rail[avr_index])
-                #             break
-
-                # power_data['Energy (J)'] = power_data["P_SOC+MEMORY"] * power_data["Run Time"]
-                # # power_data['Eng(J)/Frame'] = None
-
-                # power_obj['file_path'] = csv_path
-                # # power_collection['data_type'] 
-
-
-
 def parsePowerTraceCSV(csv_path) :
     
     trace_data = None
@@ -227,4 +173,22 @@ def parsePowerTraceCSV(csv_path) :
     
     return trace_obj
 
+"""
+{'ID_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_002', 
+'data_label': ['NPU', 'Model_C2_v1_2_1_qdq_proxy'], 
+'data_type': ['POWER'], 
+'power_obj': {
+    'power_data': {
+        'V_VAL_VCC_PCORE': 0.798799, 
+        'I_VAL_VCC_PCORE': 1.050852, 'V_VAL_VCC_ECORE': 0.150996, 'I_VAL_VCC_ECORE': 0.026338, 'V_VAL_VCCSA': 1.11288, 'I_VAL_VCCSA': 5.715734, 'V_VAL_VCCGT': 0.000592, 'I_VAL_VCCGT': 3.7e-05, 'P_VCC_PCORE': 1.030715, 'P_VCC_ECORE': 0.014793, 'P_VCCSA': 6.907365, 'P_VCCGT': 7.2e-05, 'P_VCCL2': 0.000736, 'P_VCC1P8': 0.063183, 'P_VCCIO': 0.174757, 'P_VCCDDRIO': 0.157915, 'P_VNNAON': 0.078376, 'P_VNNAONLV': 0.004785, 'P_VDDQ': 0.079725, 'P_VDD2H': 1.042647, 'P_VDD2L': 0.002298, 'P_V1P8U_MEM': 0.061603, 'P_SOC+MEMORY': 9.619904, 'Run Time': 24.8, 'Energy (J)': 238.5736192, 'Eng(J)/Frame': 0.13266767088551282}, 
+    'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_002\\AI_NPU_model_stripped_002\\AI_NPU_model_stripped_002_pacs-summary.csv', 
+    'power_type': 'POWER', 
+    'picked': 'picked'}, 
+'trace_obj': {
+    'trace_data': {'V_VAL_VCC_PCORE': 0.92805436645, 'I_VAL_VCC_PCORE': 1.20851033869, 'V_VAL_VCC_ECORE': 0.17722534819, 'I_VAL_VCC_ECORE': 0.02954816076, 'V_VAL_VCCSA': 1.2093717451400001, 'I_VAL_VCCSA': 7.052179581985, 'V_VAL_VCCGT': 0.000616341505, 'I_VAL_VCCGT': -3.158989e-05, 'P_VCC_PCORE': 1.1683267006, 'P_VCC_ECORE': 0.01611333995, 'P_VCCSA': 8.53572688394, 'P_VCCGT': 3.1879865e-05, 'P_VCCL2': 0.000837284245, 'P_VCC1P8': 0.07149115888999999, 'P_VCCIO': 0.204229451435, 'P_VCCDDRIO': 0.19398208713, 'P_VNNAON': 0.08283928151, 'P_VNNAONLV': 0.005073477020000001, 'P_VDDQ': 0.09819469445, 'P_VDD2H': 1.272967728105, 'P_VDD2L': 0.00212485188, 'P_V1P8U_MEM': 0.073973068115, 'P_SOC+MEMORY': 11.726846316795, 'Run Time': 20.0},
+    'file_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_002\\AI_NPU_model_stripped_002\\AI_NPU_model_stripped_002_pacs-traces-100sr.csv'}, 
+'model_output_obj': {
+    'model_output_path': '\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data\\NPU\\Model_C2_v1_2_1_qdq_proxy\\AI_NPU_model_stripped_002\\NPU_Model_C2_v1_2_1_qdq_proxy_output.txt', 'model_output_data': {
+        'read_model': [26.59, 'ms'], 'compile_model': [41.5, 'ms'], 'start_mem_usage': [126848.0, 'KB'], 'end_mem_usage': [145416.0, 'KB'], 'ram_used': [18568.0, 'KB'], 'first_inference': [4.24, 'ms'], 'device': ['NPU', ''], 'iterations': [35966.0, ''], 'duration': [20000.2, 'ms'], 'latency_median': [0.54, 'ms'], 'throughput': [1798.28, 'FPS']}, 'model_output_status': 'successful'}}, 
 
+"""

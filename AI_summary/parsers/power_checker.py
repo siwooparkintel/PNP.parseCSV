@@ -70,8 +70,8 @@ def checkAndMarkPower(whole_sets, picks) :
         if full_data_label not in done_model:
             done_model.add(full_data_label)
             objs = pullSameLabel(whole_sets, full_data_label)
-            if picks['only_picks'] is True:
-                sortAndPick(objs, picks)
+            # if picks['only_picks'] is True:
+            sortAndPick(objs, picks)
             
     
         

@@ -1,7 +1,7 @@
 # Socwatch Options:
 # Command line options: -s 0 -o c:\hobl_data\socwatch\AI_GPU_model_stripped -f temp -f npu -f gfx -f memss-pstate -f cpu-cstate -f hw-cpu-hwp -f hw-cpu-cstate -f hw-cpu-pstate -f os-cpu-cstate -f os-cpu-pstate -f hw-igfx-cstate -f hw-igfx-pstate -f display-state -f ddr-bw -f bw-all -f noc-pstate -f media-pstate -m -r auto --no-post-processing 
 
-
+# new socwatch header is being collected every time new header is detected
 socwatch_header_dict = dict()
 
 def cpuModelTable(table) :
@@ -184,6 +184,7 @@ def parseSocwatch(abs_path, socwatch_targets) :
                     if tline == "" :
                         tTable['isCompleted'] = True
                         socwatchTableTypeChecker(tTable, CORE_TYPE)
+                        # Socwatch data is being parsed, header is also being collected and expended for unified header later
                         extractHeader(tTable)
                         socwatch_obj['socwatch_tables'].append(tTable)
 
@@ -206,11 +207,6 @@ def parseSocwatch(abs_path, socwatch_targets) :
 
         return socwatch_obj
 
-# def getBuckets(key) :
-#     for item in socwatch_targets :
-#         if key == item["key"] and "buckets" in item :
-#             return item['buckets']
-#     return None
         
 def pStateBecketizer(header_dict, socwatch_targets) :
 
@@ -227,7 +223,12 @@ def pStateBecketizer(header_dict, socwatch_targets) :
 
 
 
-
+# socwatch_targets are the key and target strings that the parsing process is looking for
+# it is coming from the main function, parsing_AI_summary.py 
 def getSocwatchHeader(socwatch_targets) :
+    # after collected all the head, some p-states, frequency collection is too spreading out
+    # need to be bucketized for a more compact report, 
+    # bucket instruction is in the socwatch_targets which can be defined by user
     pStateBecketizer(socwatch_header_dict, socwatch_targets)
+    # final condensed socwatch header returns
     return socwatch_header_dict
