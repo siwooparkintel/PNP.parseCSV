@@ -221,7 +221,11 @@ def reportInforencingOnlyPower(file_path, hobl_data, DAQ_target):
     for key in trace_blocks[0]["trace_obj"]["trace_data"] :
         header.append(key)
 
-    header.append("file_path")  
+    header.append("file_path")
+    header.append("total_row")
+    header.append("duration_in_scale")  
+    header.append("inf_start")
+    header.append("inf_end")
 
     # for rail_list in allPowerData :
     for block in trace_blocks :
@@ -230,6 +234,14 @@ def reportInforencingOnlyPower(file_path, hobl_data, DAQ_target):
         for key in header :
             if key == "file_path" :
                 trace_line.append(block["trace_obj"][key])
+            elif key == "total_row" :
+                trace_line.append(block["trace_obj"]["total_row"])
+            elif key == "duration_in_scale" :
+                trace_line.append(block["trace_obj"]["duration_in_scale"])
+            elif key == "inf_start" :
+                trace_line.append(block["trace_obj"]["inf_start"])
+            elif key == "inf_end" :
+                trace_line.append(block["trace_obj"]["inf_end"])
             elif key in trace_data :
                 trace_line.append(trace_data[key])
         

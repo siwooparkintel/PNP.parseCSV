@@ -42,7 +42,6 @@ def getReversedPower(csv_list, total_row_num, infer_duration, time_scale, power_
 
 def getInferencingStartReversed(target_power_reversed, target_rail, file_path) :
 
-          
     # now have to find the power surge by checking power changes (slope and derivative)
     step_avr = list()
     steps = 10
@@ -87,7 +86,7 @@ def getInferencingStartReversed(target_power_reversed, target_rail, file_path) :
                 return data_set[0]
 
     if isInferencingFound == False :
-        # print("======= not found: ", file_path, target_rail, data_set, step_avr)   
+        print("======= not found: ", file_path, target_rail, data_set, step_avr)   
         return None                 
     
 # print("======================================")
@@ -141,21 +140,32 @@ def averageInferencingPower(hobl_data, DAQ_target) :
                 # [Power_rail_name, slope minimum, power delta minimum]
                 target_rail = ["P_VCC_PCORE", 3, 3]
                 if "GPU" in device:
-                    target_rail = ["P_VCCGT", 2.5, 2.5]  # after checking 50 files 
+                    target_rail = ["P_VCCGT", 2.24, 2]  # after checking 50 files 
                 elif "NPU" in device:
-                    target_rail = ["P_VCCSA", 2.6, 1.38]
+                    target_rail = ["P_VCCSA", 1.77, 0.38] # slope is the main detector for power surge
                 
                 infer_start_idx = -1
                 infer_end_idx = -1
 
                 target_power_reversed = getReversedPower(csv_list, total_row_num, infer_duration, time_scale, target_obj[target_rail[0]])
                 infer_start_reversed = getInferencingStartReversed(target_power_reversed, target_rail, block["trace_obj"]["file_path"])
-                infer_duration_in_scale = round((infer_duration / time_scale))
-                infer_start_idx = total_row_num - infer_duration_in_scale - infer_start_reversed
-                infer_end_idx = infer_start_idx + infer_duration_in_scale
-
-                block["trace_obj"]["trace_data"] = getAveragePowerByRails(csv_list[infer_start_idx:infer_end_idx], time_scale, target_obj, block["model_output_obj"]["model_output_data"]["throughput"][0])
-                # print("========", block["trace_obj"]["trace_data"])
+                if infer_start_reversed is None :
+                    block["trace_obj"]["total_row"] = None
+                    block["trace_obj"]["duration_in_scale"] = None
+                    block["trace_obj"]["inf_start"] = None
+                    block["trace_obj"]["inf_end"] = None
+                    block["trace_obj"]["trace_data"] = None
+                else :
+                    infer_duration_in_scale = round((infer_duration / time_scale))
+                    infer_start_idx = total_row_num - infer_duration_in_scale - infer_start_reversed
+                    infer_end_idx = infer_start_idx + infer_duration_in_scale
+                    # print(f"=== total_row_num: {total_row_num}, infer_duration_in_scale: {infer_duration_in_scale}, infer_start_idx: {infer_start_idx}, infer_end_idx: {infer_end_idx}, path: {block["trace_obj"]["file_path"]}")
+                    block["trace_obj"]["total_row"] = total_row_num
+                    block["trace_obj"]["duration_in_scale"] = infer_duration_in_scale
+                    block["trace_obj"]["inf_start"] = infer_start_idx
+                    block["trace_obj"]["inf_end"] = infer_end_idx
+                    block["trace_obj"]["trace_data"] = getAveragePowerByRails(csv_list[infer_start_idx:infer_end_idx], time_scale, target_obj, block["model_output_obj"]["model_output_data"]["throughput"][0])
+                    # print("========", block["trace_obj"]["trace_data"])
     # sub_slopes = list()
     # sub_deriv = list()
     # for infer_set in NPU_list :
