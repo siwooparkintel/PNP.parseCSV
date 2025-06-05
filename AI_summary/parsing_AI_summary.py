@@ -143,7 +143,7 @@ To parse every POWER_SOCWATCH
 ====================================================================================
 '''
 
-picks = {'power_pick':MED}
+picks = {'power_pick':MED, 'inferencingOnlyPower':False, 'sortSimilarData':False}
 
 
 
@@ -298,7 +298,7 @@ def main():
     # since it is keep improving, changing
     # ===========================================================================
     # print("====[hobl_sets]", hobl_sets)
-    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, DAQ_target)
+    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, DAQ_target, picks)
 
 
 start_time = time.perf_counter()

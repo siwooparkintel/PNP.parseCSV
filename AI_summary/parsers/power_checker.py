@@ -9,7 +9,10 @@ def markPicked(list, PICKED):
         elif PICKED == "MAX":
             list[len(list)-1]['power_obj']['picked'] = 'picked'
         elif PICKED == "MED" and len(list)%2 == 0:
-            list[int(len(list)/2)]['power_obj']['picked'] = 'picked'
+            # this picks middle lower side. ex) 4 => (4/2)-1 = 1. [0, 1, 2, 3] pick 1 
+            list[int(len(list)/2) - 1]['power_obj']['picked'] = 'picked'
+            # this picks middle higher side. ex) 4 => (4/2) = . [0, 1, 2, 3] pick 2 
+            # list[int(len(list)/2)]['power_obj']['picked'] = 'picked'
         elif PICKED == "MED" and len(list)%2 == 1:
             list[math.floor(len(list)/2)]['power_obj']['picked'] = 'picked'
 

@@ -146,7 +146,7 @@ def reportAllPowerAndType(file_path, hobl_data) :
         writer.writerows(allPowerData)
 
 
-def reportPickedData(file_path, hobl_data, socwatch_targets) :
+def reportPickedData(file_path, hobl_data, socwatch_targets, picks) :
 
     header = ['Condition', 'Name']  
     socwatch_header_dict = soc.getSocwatchHeader(socwatch_targets)
@@ -161,10 +161,13 @@ def reportPickedData(file_path, hobl_data, socwatch_targets) :
             elif  "socwatch_obj" in block:
                 socwatch_blocks.append(block)
                 # socwatch_handler(block, socwatch_targets, socwatch_header_dict)
+            elif picks["sortSimilarData"] == False :
+                data_line = powerOutputHandler(block, header)
+                print(data_line)
+                data_lines.append(data_line)
             else :
                 data_line = powerOutputHandler(block, header)
                 # inf_data_line = infOnlyPowerHandler(block, header) if data_line is not None and picks["inferencing_power"] else None
-
                 similar_model_index = None
                 for index in range(len(data_lines)-1, -1, -1):
                     if data_lines[index][1].find(data_line[1]) >= 0:
@@ -209,7 +212,7 @@ def getTraceObject(hobl_data, DAQ_target) :
     return block_list
         
 
-def reportInforencingOnlyPower(file_path, hobl_data, DAQ_target):
+def reportInferencingOnlyPower(file_path, hobl_data, DAQ_target):
     start_time = time.perf_counter()
 
     inf_only_lines = list()
@@ -284,11 +287,11 @@ def reportInforencingOnlyPower(file_path, hobl_data, DAQ_target):
     print(f"{len(trace_blocks)} of Detecting and Calculate inferencing only Power from trace raw data [Elapsed time:::] {elapsed_time} seconds")
 
 
-def writeParsedInCSV(file_path, hobl_data, socwatch_targets, DAQ_target) :
+def writeParsedInCSV(file_path, hobl_data, socwatch_targets, DAQ_target, picks) :
     
     reportAllPowerAndType(file_path, hobl_data)
-    reportPickedData(file_path, hobl_data, socwatch_targets)
-    reportInforencingOnlyPower(file_path, hobl_data, DAQ_target)
+    reportPickedData(file_path, hobl_data, socwatch_targets, picks)
+    reportInferencingOnlyPower(file_path, hobl_data, DAQ_target) if picks['inferencingOnlyPower'] else print("[No inferencing only Power selected]") 
 
 
     
