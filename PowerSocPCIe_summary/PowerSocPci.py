@@ -26,31 +26,20 @@ SWP = [
         "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_007_PCIe\socwatch\web_cataV3_si.csv"
     }
 ]
-
-
-    # {
-    #     "data_label":"CataV3+IT",
-    #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2511.5_CataV3_IT\CataV3_IT\Power\catav3_power01_pick\catav3_power01_pacs-summary.csv",
-    #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2511.5_CataV3_IT\CataV3_IT\Socwatch\catav3_socwatch01\socwatch\web_catapultV3.csv",
-    #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2511.5_CataV3_IT\CataV3_IT\Socwatch\catav3_IT_pcie01\IT_pcie_1\web_catapultV3.csv"
-    # },
-    # {
-    #     "data_label":"CataV3+IT+CCA+LCLT",
-    #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2526.5_CataV3_IT_CCA_LC\Power\Power_001_Ppick\Power_001_pacs-summary.csv",
-    #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2526.5_CataV3_IT_CCA_LC\socwatch\Socwatch_Power_002_spick\CataV3_IT_CCA_LC_002\CataV3_IT_CCA_LC.csv",
-    #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2526.5_CataV3_IT_CCA_LC\PCIe_only\PCIe_Power_CV3ITCCALCUHX30_000\socwatch\web_catapultV3.csv"
-    # },
     # {
     #     "data_label":"CataV3+IT+CCA+LCLT+UHX2",
     #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Power_CataV3_UHX2_001_ppick\Power_CataV3_UHX2_001_pacs-summary.csv",
     #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Socwatch_Power_CataV3_UHX2_003_spick\CataV3_UHX2_003\CataV3_IT_CCA_LCLT_UHX2_003.csv",
     #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\PCIe_Power_CataV3_UHX2_000\CataV3_UHX2_PCIe\CataV3_IT_CCA_LCLT_UHX2_PCIeOnly.csv"
+    # },
+    # {
+    #     "data_label":"CataV3+CCA+LCLT+UHX2",
+    #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_003_Ppick\web_cataV3_si_003\web_cataV3_si_003_pacs-summary.csv",
+    #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_004_Spick\socwatch\web_cataV3_si.csv",
+    #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_007_PCIe\socwatch\web_cataV3_si.csv"
     # }
+
     
-
-
-
-# print(SWP[0]["power_summary_path"])
 
 socwatch_targets = [
     {"key": "CPU_model", "lookup": "CPU native model"},
