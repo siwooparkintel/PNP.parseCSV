@@ -6,7 +6,7 @@ import parsers.tools as tools
 import parsers.pcie_socwatch_summary_parser as psoc
 import parsers.socwatch_summary_parser as soc
 import parsers.power_summary_parser as psp
-import parsers.reporter as rpt
+import parsers.PowerSocPci_reporter as rpt
 
 import argparse
 
@@ -23,7 +23,13 @@ SWP = [
         "data_label":"CataV3+CCA+LCLT+UHX2",
         "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_003_Ppick\web_cataV3_si_003\web_cataV3_si_003_pacs-summary.csv",
         "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_004_Spick\socwatch\web_cataV3_si.csv",
-        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_007_PCIe\socwatch\web_cataV3_si.csv"
+        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_007_PCIe\socwatch\PCIeOnly_web_cataV3_si.csv"
+    },
+    {
+        "data_label":"CataV3+IT+CCA+LCLT+UHX2",
+        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Power_CataV3_UHX2_001_ppick\Power_CataV3_UHX2_001_pacs-summary.csv",
+        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Socwatch_Power_CataV3_UHX2_003_spick\CataV3_UHX2_003\CataV3_IT_CCA_LCLT_UHX2_003.csv",
+        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\PCIe_Power_CataV3_UHX2_000\CataV3_UHX2_PCIe\CataV3_IT_CCA_LCLT_UHX2_PCIeOnly.csv"
     }
 ]
     # {
@@ -62,16 +68,19 @@ socwatch_targets = [
     {"key": "CPU_temp", "lookup": "Temperature Metrics Summary - Sampled: Min/Max/Avg"},
     {"key": "SoC_temp", "lookup": "SoC Domain Temperatures Summary - Sampled: Min/Max/Avg"},
     {"key": "NPU_Dstate", "lookup": "Neural Processing Unit (NPU) D-State Residency Summary: Residency (Percentage and Time)"},
-    {"key": "DC_count", "lookup": "Dynamic Display State Enabling"},
     {"key": "Media_Cstate", "lookup": "Media C-State Residency Summary: Residency (Percentage and Time)"},
     {"key": "NPU_Pstate", "lookup": "Neural Processing Unit (NPU) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "1900", "1901-2900", "2901-3899", "3900"]},
     {"key": "MEMSS_Pstate", "lookup": "Memory Subsystem (MEMSS) P-State Summary - Sampled: Approximated Residency (Percentage)"},
     {"key": "Media_Pstate", "lookup": "Media P-State Summary - Sampled: Approximated Residency (Percentage)"},
     {"key": "NoC_Pstate", "lookup": "Network on Chip (NoC) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["400", "401-1049", "1050"]},
     {"key": "D2D_Pstate", "lookup": "Die-to-die (D2D) P-State Summary - Sampled: Approximated Residency (Percentage)"},
-    {"key": "Ring_Pstate", "lookup": "Ring P-State Summary - Sampled: Approximated Residency (Percentage)"},
+    {"key": "Ring_Pstate", "lookup": "Ring P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-999", "1000-1999", "2000-3999"]},
     {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-2049", "2050"]}
 ]
+
+"""
+    {"key": "DC_count", "lookup": "Dynamic Display State Enabling"},
+"""
 
 PCIe_targets = [
     {"key": "PCIe_LPM", "devices":["NVM"], "lookup": "PCIe LPM Summary - Sampled: Approximated Residency (Percentage)"},
@@ -134,7 +143,7 @@ result_csv = args.output
 
 
 if result_csv == None : 
-    result_csv = f"{BASE}\\AI_models_summary"
+    result_csv = f"{BASE}\\PowerSocPCIe_summary"
 
 
 
@@ -308,7 +317,7 @@ def main():
     # since it is keep improving, changing
     # ===========================================================================
     print("====[hobl_sets]", hobl_sets)
-    rpt.writeParsedInCSV(result_csv, hobl_sets, DAQ_target, socwatch_targets, PCIe_targets)
+    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, PCIe_targets, SWP)
 
 
 start_time = time.perf_counter()
