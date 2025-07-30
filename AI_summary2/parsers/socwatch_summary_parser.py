@@ -1,5 +1,3 @@
-import csv
-import parsers.tools as tools
 # Socwatch Options:
 # Command line options: -s 0 -o c:\hobl_data\socwatch\AI_GPU_model_stripped -f temp -f npu -f gfx -f memss-pstate -f cpu-cstate -f hw-cpu-hwp -f hw-cpu-cstate -f hw-cpu-pstate -f os-cpu-cstate -f os-cpu-pstate -f hw-igfx-cstate -f hw-igfx-pstate -f display-state -f ddr-bw -f bw-all -f noc-pstate -f media-pstate -m -r auto --no-post-processing 
 
@@ -29,9 +27,7 @@ def tempAvrTable(table):
     data = {table['label']:copied[0][4]}
     for index in range(1, len(copied), 1):
         line = copied[index]
-        tkey = line[0].split("/")[-1]
-        if tkey != "" :
-            data[tkey] = line[4]
+        data[line[0].split("/")[-1]] = line[4]
     table['table_data'] = data 
 
 def bwTotalAvr(table) :
@@ -133,9 +129,39 @@ def osWakeupsTable(table) :
         data[key] = value
     table['table_data'] = data
 
+def bucketizedTable(table, keyIdx, ValueIdx, buckets) :
+    copied = table['table_data'].copy()
+    data = dict()
+    bucketized = {bk: 0 for bk in buckets}
+
+    for idx in range(len(copied)):
+        line = copied[idx]
+        key = line[keyIdx]
+        if "_Pstate" in table['label'] and idx > 0:
+            key = key.split(".")[0]
+        data[key] = line[ValueIdx]
+        
+        if idx > 0 :
+            for bucket in bucketized :
+                ranges = bucket.split("-")
+                if len(ranges) == 1 and bucket == key :
+                    bucketized[bucket] = float(line[ValueIdx])
+                elif len(ranges) == 2:
+                    min = int(ranges[0])
+                    max = int(ranges[1])
+                    if int(key) >= min and int(key) <= max :
+                        bucketized[bucket] = bucketized[bucket] + float(line[ValueIdx])
+
+    table['table_data'] = data
+    extended = dict()
+    first_key_value = next(iter(data.items()))
+    extended[first_key_value[0]] = first_key_value[1]
+    extended.update(bucketized)
+    table['bucketized_data'] = extended
+
+
 def defaultResidencyTable(table, keyIdx, ValueIdx) :
     copied = table['table_data'].copy()
-    # print("[defaultResidencyTable::copied] ", table['label'], copied)
     data = dict()
     for idx in range(len(copied)):
         line = copied[idx]
@@ -144,10 +170,9 @@ def defaultResidencyTable(table, keyIdx, ValueIdx) :
             key = key.split(".")[0]
         data[key] = line[ValueIdx]
     table['table_data'] = data
-    # print("[data] ", data)
-    # print("==========================================================")
 
-def socwatchTableTypeChecker(table, core_type) :
+
+def socwatchTableTypeChecker(table, core_type, soc_target) :
 
     label = table['label']
     if label == 'CPU_model':
@@ -166,6 +191,8 @@ def socwatchTableTypeChecker(table, core_type) :
         bwTotalAvr(table)
     elif label == "CPU_temp" or label == "SoC_temp":
         tempAvrTable(table)
+    elif "buckets" in soc_target :
+        bucketizedTable(table, 0, 1, soc_target['buckets'])
     else :
         defaultResidencyTable(table, 0, 1)
 
@@ -183,11 +210,6 @@ def extractHeader(table) :
         socwatch_header_dict[table["label"]] = set_keys
 
 
-
-
-
-
-
 def parseSocwatch(abs_path, socwatch_targets) :
 
     socwatch_obj = dict()
@@ -195,20 +217,18 @@ def parseSocwatch(abs_path, socwatch_targets) :
     socwatch_obj['socwatch_tables'] = []
     socwatch_obj['core_number'] = 0
     CORE_TYPE = None
-
-    with open(abs_path, encoding='utf-8-sig', newline='') as csvfile:
-
-        csvreader = csv.reader(csvfile)
+    with open(abs_path, 'r') as file:
 
         for target in socwatch_targets : 
             tTable = dict()
-            for tlist in csvreader :
-
+            for line in file :
+                tline = line.strip()
                 if 'isCompleted' in tTable and tTable['isCompleted'] == False :
+
                     # if the table_data is initiated, 'isCompleted' exists, keep collecting line until empty line comes
-                    if all(item == "" for item in tlist) :
+                    if tline == "" :
                         tTable['isCompleted'] = True
-                        socwatchTableTypeChecker(tTable, CORE_TYPE)
+                        socwatchTableTypeChecker(tTable, CORE_TYPE, target)
                         # Socwatch data is being parsed, header is also being collected and expended for unified header later
                         extractHeader(tTable)
                         socwatch_obj['socwatch_tables'].append(tTable)
@@ -218,25 +238,17 @@ def parseSocwatch(abs_path, socwatch_targets) :
                             CORE_TYPE = tTable['table_data'].copy()
                         break
                     else :
-                        # line_list = [item.strip() for item in tline.split(',')]
-                        # print("======", tlist)
-                        trimmed_list = tools.trim_list(tlist)
-                        # print("======", trimmed_list)
-
-                        
+                        line_list = [item.strip() for item in tline.split(',')]
+                        # print("======", tline, line_list)
+                        line_list_num = len(line_list)
                         # this is removing '--------------' seperating line
                         # len(set(line_list[line_list_num-1])) returns number of different char, '-----' return 1, only contains single char
-
-                        if len(trimmed_list) > 0 :
-                            tset = set(trimmed_list[0])
-                            if not (len(tset) == 1 and "-" in tset) : 
-                                # print(trimmed_list)
-                                tTable['table_data'].append(trimmed_list)
-                elif len(tlist) > 0 and tlist[0].rfind(target['lookup']) >=0 :
+                        if line_list_num > 0 and len(set(line_list[line_list_num-1])) != 1 :
+                            tTable['table_data'].append(line_list)
+                elif tline.rfind(target['lookup']) >=0 :
                     tTable['label'] = target['key']
                     tTable['table_data'] = list()
                     tTable['isCompleted'] = False  
-
 
         return socwatch_obj
 
@@ -264,5 +276,4 @@ def getSocwatchHeader(socwatch_targets) :
     # bucket instruction is in the socwatch_targets which can be defined by user
     pStateBecketizer(socwatch_header_dict, socwatch_targets)
     # final condensed socwatch header returns
-    # print(socwatch_header_dict)
     return socwatch_header_dict

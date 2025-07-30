@@ -17,7 +17,7 @@ def queryData(data_label) :
     data_line = None
     for line_index in range(len(data_lines)-1, -1, -1):
         line = data_lines[line_index]
-        if data_label == line[0]:
+        if data_label == line[1]:
             data_line = line
             break
     return data_line
@@ -83,33 +83,27 @@ def socwatch_handler(block, socwatch_targets, soc_header_dict) :
                 else :
                     data_line.append(None)
 
+
 def pcie_socwatch_handler(block, PCIe_targets, soc_header_dict) :
     data_line = queryData(block['data_label'])
-    # print("=====pulled: ", block['data_label'], data_line)
     if data_line is not None:
         pcie_socwatch_tables = block['pcie_socwatch_obj']['pcie_socwatch_tables']
-        # print("=====socwatch_tables: ", socwatch_tables)
         for soc_key in soc_header_dict :
             soc_head = soc_header_dict[soc_key]
             table = getTableByLabel(pcie_socwatch_tables, soc_key)
-            buckets = next((item for item in PCIe_targets if item['key'] == soc_key and "buckets" in item), None)
-            # print("=====pulled: ", soc_key, table)
             for s_key in soc_head :
-                # print("== found buckets: ", soc_key, buckets)
-                ranges = s_key.split("-")
-                if table is not None and buckets is not None and len(ranges) == 2:
-                    min = int(ranges[0])
-                    max = int(ranges[1])
-                    copied = table['table_data'].copy()
-                    copied.pop(next(iter(copied)))
-                    total = sum([float(copied[key]) for key in copied if int(key) >= min and int(key) <= max])
-                    # print([float(copied[key]) for key in copied if int(key) >= min and int(key) <= max])
-                    # print("== found buckets: ", table['table_data'], copied, ranges, total)
-                    data_line.append(total)
-                elif table is not None and s_key in table['table_data'] :
+                if table is not None and s_key in table['table_data'] :
                     data_line.append(table['table_data'][s_key])
                 else :
                     data_line.append(None)
+
+def file_path_handler(block):
+    data_line = queryData(block['data_label'])
+    if data_line is not None:
+        data_line.append(block["power_obj"]["file_path"])
+        data_line.append(block["socwatch_obj"]["socwatch_path"])
+        data_line.append(block["pcie_socwatch_obj"]["pcie_socwatch_path"])
+
 
 def powerHandler(block, header) :
     data_line = [block["data_label"][0], block["data_label"][1]]
@@ -122,12 +116,18 @@ def powerHandler(block, header) :
 
 def powerOutputHandler(block, header) :
     # print("[powerOutputHandler::block] ", block)
-    data_line = [block["data_label"], block["data_label"]]
+    data_line = ["Web Browsing + AI", block["data_label"]]
     power_obj = block["power_obj"]
     for key in power_obj['power_data']:
         data_line.append(power_obj['power_data'][key])
         if len(data_lines) == 0:
             header.append(key)
+
+    # if len(data_lines) == 0:
+    #     header.append("File Path")
+    # data_line.append(power_obj["file_path"])
+    # print("[header] ", header)
+    # print("[data_line] ", data_line)
     return data_line
 
 def getSocwatchHeaderList(soc_dict) :
@@ -137,9 +137,9 @@ def getSocwatchHeaderList(soc_dict) :
     return soc_list
 
 
-def reportPickedData(file_path, hobl_data, socwatch_targets, PCIe_targets) :
+def reportPickedData(result_path, hobl_data, socwatch_targets, PCIe_targets, SWP) :
 
-    header = ['Condition', 'Name']  
+    header = ['Workload', 'Condition']  
     socwatch_header_dict = soc.getSocwatchHeader(socwatch_targets)
     pcie_socwatch_header_dict = psoc.getPcieSocwatchHeader(PCIe_targets)
     # print("[socwatch_header_dict] ", socwatch_header_dict)
@@ -159,11 +159,17 @@ def reportPickedData(file_path, hobl_data, socwatch_targets, PCIe_targets) :
     for block in socwatch_blocks :
         socwatch_handler(block, socwatch_targets, socwatch_header_dict)
         pcie_socwatch_handler(block, PCIe_targets, pcie_socwatch_header_dict)
-    
+        file_path_handler(block)
+
     socwatch_header = getSocwatchHeaderList(socwatch_header_dict)
-    pcie_socwatch_hader = getSocwatchHeaderList(pcie_socwatch_header_dict)
+    pcie_socwatch_header = getSocwatchHeaderList(pcie_socwatch_header_dict)
+    file_path_header = [key for key in SWP[0] if key != "data_label"]
+    print("[file_path_header] ", file_path_header)
+
     header.extend(socwatch_header)
-    header.extend(pcie_socwatch_hader)
+    header.extend(pcie_socwatch_header)
+    header.extend(file_path_header)
+
     data_lines.insert(0, header)
 
     # TODO : file extention handler goes here
@@ -172,11 +178,11 @@ def reportPickedData(file_path, hobl_data, socwatch_targets, PCIe_targets) :
     #     extention = file_names[-1]
     #     upto_name = ".".join(file_names[0:-1])   
 
-    with open(file_path+"_horizontal.csv", 'w', newline='') as file:
+    with open(result_path+"_horizontal.csv", 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_lines)
     
-    with open(file_path+"_vertical.csv", 'w', newline='') as file:
+    with open(result_path+"_vertical.csv", 'w', newline='') as file:
         writer = csv.writer(file)
         data_vertical = convertToVerticalData(data_lines)
         writer.writerows(data_vertical)
@@ -192,9 +198,9 @@ def getTraceObject(hobl_data, DAQ_target) :
     return block_list
         
 
-def writeParsedInCSV(file_path, hobl_data, DAQ_target, socwatch_targets, PCIe_targets) :
+def writeParsedInCSV(result_path, hobl_data, socwatch_targets, PCIe_targets, SWP) :
     
-    reportPickedData(file_path, hobl_data, socwatch_targets, PCIe_targets)
+    reportPickedData(result_path, hobl_data, socwatch_targets, PCIe_targets, SWP)
 
 
     

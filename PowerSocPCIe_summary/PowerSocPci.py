@@ -9,6 +9,7 @@ import parsers.power_summary_parser as psp
 import parsers.PowerSocPci_reporter as rpt
 
 import argparse
+import json
 
 parser = argparse.ArgumentParser(prog='Socwatch summary parser')
 parser.add_argument('-i', '--input', help='json input will be here')
@@ -20,16 +21,14 @@ args = parser.parse_args()
 # sw prograssion data list of dicts
 SWP = [
     {
-        "data_label":"CataV3+CCA+LCLT+UHX2",
-        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_003_Ppick\web_cataV3_si_003\web_cataV3_si_003_pacs-summary.csv",
-        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_004_Spick\socwatch\web_cataV3_si.csv",
-        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_007_PCIe\socwatch\PCIeOnly_web_cataV3_si.csv"
+        "data_label":"CataV3 128EU",
+        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2526.1_CataV3_64EU\CataV3_128EU_SET2\web_cataV3_si_006\web_cataV3_si_006\web_cataV3_si_006_pacs-summary.csv",
+        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2526.1_CataV3_64EU\CataV3_128EU_SET2\web_cataV3_si_008\socwatch\web_cataV3_si.csv",
     },
     {
-        "data_label":"CataV3+IT+CCA+LCLT+UHX2",
-        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Power_CataV3_UHX2_001_ppick\Power_CataV3_UHX2_001_pacs-summary.csv",
-        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Socwatch_Power_CataV3_UHX2_003_spick\CataV3_UHX2_003\CataV3_IT_CCA_LCLT_UHX2_003.csv",
-        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\PCIe_Power_CataV3_UHX2_000\CataV3_UHX2_PCIe\CataV3_IT_CCA_LCLT_UHX2_PCIeOnly.csv"
+        "data_label":"CataV3 64EU",
+        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2526.1_CataV3_64EU\CataV3_64EU_SET2\web_cataV3_si_003\web_cataV3_si_003\web_cataV3_si_003_pacs-summary.csv",
+        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2526.1_CataV3_64EU\CataV3_64EU_SET2\web_cataV3_si_010\socwatch\web_cataV3_si.csv",
     }
 ]
     # {
@@ -140,7 +139,15 @@ MED = "MED"
 BASE = args.input
 result_csv = args.output
 
+if args.input is None:
+    print("============== No input")
+else :
+    with open(args.input, 'r') as f:
+        SWP = json.load(f)
+        print(SWP)
 
+
+        # File content will be processed here
 
 if result_csv == None : 
     result_csv = f"{BASE}\\PowerSocPCIe_summary"

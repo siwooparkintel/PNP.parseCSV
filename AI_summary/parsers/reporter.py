@@ -192,11 +192,11 @@ def reportPickedData(file_path, hobl_data, socwatch_targets, picks) :
     #     extention = file_names[-1]
     #     upto_name = ".".join(file_names[0:-1])   
 
-    with open(file_path+"_horizontal.csv", 'w', newline='') as file:
+    with open(file_path+"_Picked_h.csv", 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerows(data_lines)
     
-    with open(file_path+"_vertical.csv", 'w', newline='') as file:
+    with open(file_path+"_Picked_v.csv", 'w', newline='') as file:
         writer = csv.writer(file)
         data_vertical = convertToVerticalData(data_lines)
         writer.writerows(data_vertical)

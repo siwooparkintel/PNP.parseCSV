@@ -174,6 +174,7 @@ def getDatasetLabel(abs_path) :
         return [folder_list[-2], folder_list[-1]]
 
 def createDataset(abs_path) :
+    # print("[abs_path] ", abs_path)
     hobl_sets.append({
         "ID_path":abs_path,
         "data_label":getDatasetLabel(abs_path),
@@ -201,7 +202,7 @@ def add_etl(abs_path):
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
     if ETL not in dataset["data_type"] :
-        dataset["data_type"].append(ETL)
+        dataset["data_type"].insert(0, ETL)
     dataset["etl_path"] = abs_path
 
 def add_model_output(abs_path):
@@ -241,7 +242,7 @@ def add_socwatch(abs_path):
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
     if SOCWATCH not in dataset["data_type"] :
-        dataset["data_type"].append(SOCWATCH)
+        dataset["data_type"].insert(0, SOCWATCH)
     dataset["socwatch_obj"] = soc.parseSocwatch(abs_path, socwatch_targets)
     global file_num
     file_num += 1
