@@ -202,6 +202,35 @@ def extractHeader(table) :
         socwatch_header_dict[table["label"]] = set_keys
 
 
+
+def parseTargetTable(target, csvreader, CORE_TYPE) :
+
+    tTable = dict()
+    for tlist in csvreader :
+
+        if 'isCompleted' in tTable and tTable['isCompleted'] == False :
+            # if the table_data is initiated, 'isCompleted' exists, keep collecting line until empty line comes
+            if "".join(tlist) == "" :
+                tTable['isCompleted'] = True
+                socwatchTableTypeChecker(tTable, CORE_TYPE, target)
+                # When socwatch data is being parsed, header is also being collected and expended for unified header later
+                extractHeader(tTable)
+
+                # need to re-write this portion
+                break
+            else :
+                trimmed_list = tools.trim_list(tlist)
+                if len(trimmed_list) > 0 :
+                    tset = set("".join(trimmed_list))
+                    if all(char in {" ", "-"} for char in tset) == False :
+                        tTable['table_data'].append(trimmed_list)
+        elif len(tlist) > 0 and tlist[0].rfind(target['lookup']) >=0 :
+            tTable['label'] = target['key']
+            tTable['table_data'] = list()
+            tTable['isCompleted'] = False  
+    return tTable
+
+
 def parseSocwatch(abs_path, socwatch_targets) :
 
     socwatch_obj = dict()
@@ -213,37 +242,78 @@ def parseSocwatch(abs_path, socwatch_targets) :
     with open(abs_path, encoding='utf-8-sig', newline='') as csvfile:
 
         csvreader = csv.reader(csvfile)
-
+        recheck_list = list()
+        nonexist_list = list()
         for target in socwatch_targets : 
-            tTable = dict()
-            for tlist in csvreader :
+            tTable = parseTargetTable(target, csvreader, CORE_TYPE)
 
-                if 'isCompleted' in tTable and tTable['isCompleted'] == False :
-                    # if the table_data is initiated, 'isCompleted' exists, keep collecting line until empty line comes
-                    if all(item == "" for item in tlist) :
-                        tTable['isCompleted'] = True
-                        socwatchTableTypeChecker(tTable, CORE_TYPE, target)
-                        # When socwatch data is being parsed, header is also being collected and expended for unified header later
-                        extractHeader(tTable)
-                        socwatch_obj['socwatch_tables'].append(tTable)
+            if "label" in tTable and tTable['label'] == 'CPU_model':
+                CORE_TYPE = tTable['table_data'].copy()
 
-                        # need to re-write this portion
-                        if tTable['label'] == 'CPU_model':
-                            CORE_TYPE = tTable['table_data'].copy()
-                        break
+            if len(tTable) == 0:
+                print("traget line not detected", tTable, target)
+                if target["key"] not in recheck_list:
+                    recheck_list.append(target["key"])
+                    csvfile.seek(0)
+                    csvreader = csv.reader(csvfile)
+                    tTable = parseTargetTable(target, csvreader, CORE_TYPE)
+                    if len(tTable) == 0:
+                        nonexist_list.append(target["key"])
                     else :
-                        trimmed_list = tools.trim_list(tlist)
-                        if len(trimmed_list) > 0 :
-                            tset = set("".join(trimmed_list))
-                            if all(char in {" ", "-"} for char in tset) == False :
-                                tTable['table_data'].append(trimmed_list)
-                elif len(tlist) > 0 and tlist[0].rfind(target['lookup']) >=0 :
-                    tTable['label'] = target['key']
-                    tTable['table_data'] = list()
-                    tTable['isCompleted'] = False  
-
-
+                        socwatch_obj['socwatch_tables'].append(tTable)
+            else :
+                socwatch_obj['socwatch_tables'].append(tTable)
+        if len(recheck_list) > 0 :
+            print("[re-looped table] : ", recheck_list, " you may want to match the order for ultimate performance") 
+        if len(nonexist_list) > 0 :
+            print("[nonexist searched table] : ", nonexist_list, " check socwatch summary source if the table is exist or check the look up text") 
         return socwatch_obj
+    
+
+
+
+# def parseSocwatch(abs_path, socwatch_targets) :
+
+#     socwatch_obj = dict()
+#     socwatch_obj['socwatch_path'] = abs_path
+#     socwatch_obj['socwatch_tables'] = []
+#     socwatch_obj['core_number'] = 0
+#     CORE_TYPE = None
+
+#     with open(abs_path, encoding='utf-8-sig', newline='') as csvfile:
+
+#         csvreader = csv.reader(csvfile)
+
+#         for target in socwatch_targets : 
+#             tTable = dict()
+#             for tlist in csvreader :
+
+#                 if 'isCompleted' in tTable and tTable['isCompleted'] == False :
+#                     # if the table_data is initiated, 'isCompleted' exists, keep collecting line until empty line comes
+#                     if all(item == "" for item in tlist) :
+#                         tTable['isCompleted'] = True
+#                         socwatchTableTypeChecker(tTable, CORE_TYPE, target)
+#                         # When socwatch data is being parsed, header is also being collected and expended for unified header later
+#                         extractHeader(tTable)
+#                         socwatch_obj['socwatch_tables'].append(tTable)
+
+#                         # need to re-write this portion
+#                         if tTable['label'] == 'CPU_model':
+#                             CORE_TYPE = tTable['table_data'].copy()
+#                         break
+#                     else :
+#                         trimmed_list = tools.trim_list(tlist)
+#                         if len(trimmed_list) > 0 :
+#                             tset = set("".join(trimmed_list))
+#                             if all(char in {" ", "-"} for char in tset) == False :
+#                                 tTable['table_data'].append(trimmed_list)
+#                 elif len(tlist) > 0 and tlist[0].rfind(target['lookup']) >=0 :
+#                     tTable['label'] = target['key']
+#                     tTable['table_data'] = list()
+#                     tTable['isCompleted'] = False  
+
+
+#         return socwatch_obj
 
         
 
