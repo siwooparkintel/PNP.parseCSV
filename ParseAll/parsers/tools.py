@@ -7,6 +7,18 @@ def parseNumeric(text) :
 def parseDevice(text) :
     return ''.join(re.findall(r'[A-Z.0-9]', text))
 
+def tryRoundifNumber(value) :
+    try :
+        return round(float(value), 2)
+    except ValueError as e:
+        return value
+
+def tryIntifNumber(value) :
+    try :
+        return int(value)
+    except ValueError as e:
+        return value
+        
 def splitLastItem(abs_path, joint, cutNum) :
     item_list = abs_path.split(joint)
     return [joint.join(item_list[:-cutNum]), item_list[len(item_list)-1]]
@@ -79,7 +91,25 @@ def flatten_socwatch_dic(entry, socwatch_targets):
         return flat_socwatch
     else :
         return {}
-    
+
+def flatten_pcie_socwatch_dic(entry, pcie_socwatch_targets):
+    if "pcie_socwatch_obj" in entry and "pcie_socwatch_tables" in entry["pcie_socwatch_obj"] :
+        flat_socwatch = {}
+        for table in entry["pcie_socwatch_obj"]["pcie_socwatch_tables"]:
+            # flat_socwatch.update(table["table_data"]) if "table_data" in table else {}
+
+            data = table["table_data"]
+            if "bucketized_data" in table:
+                data = table["bucketized_data"]
+            for item in data :
+                # print(item, item+"_"+table["label"])
+                flat_socwatch[item+"        "+table["label"]] = tryRoundifNumber(data[item])
+            # flat_socwatch[table]
+        flat_socwatch['pcie_socwatch_path'] = entry['pcie_socwatch_obj']['pcie_socwatch_path']
+        return flat_socwatch
+    else :
+        return {}
+        
 def errorAndExit(msgs) :
     print("=============================================================================")
     sys.exit("[Error] :: " + msgs)

@@ -210,8 +210,8 @@ def socwatchTableTypeChecker(table, core_type, soc_target) :
     elif label == 'CPU_Pavr' : 
         coreFreqAvrTable(table, 0, 1)
     elif label == 'CPU_Pstate' : 
-        # coreFreqResidencyTable(table, core_type)
-        coreFreqPerCoreResidencyTable(table, core_type)
+        coreFreqResidencyTable(table, core_type)
+        # coreFreqPerCoreResidencyTable(table, core_type)
     elif label == 'DC_count':
         oneLineColonSeperater(table)
     elif label == 'DDR_BW' or label == 'IO_BW' or label == 'VC1_BW' or label == 'NPU_BW' or label == 'Media_BW' or label == 'IPU_BW' or label == 'CCE_BW' or label == 'GT_BW' or label == 'D2D_BW':

@@ -32,7 +32,7 @@ def defaultResidencyTable(table, keyIdx, ValueIdx) :
 def PCIeTableTypeChecker(table, target) :
 
     label = table['label']
-    if label == 'PCIe_LPM' or label == "PCIe_Active":
+    if label == 'PCIe_LPM' or label == "PCIe_Active" or label == "PCIe_LTRsnoop":
         NVMResidencyTable(table, target)
     else :
         defaultResidencyTable(table, 0, 1)

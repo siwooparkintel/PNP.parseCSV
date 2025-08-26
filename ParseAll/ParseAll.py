@@ -109,12 +109,13 @@ CL_DAQ_TRACES = 'pacs-traces'
 ETL = "ETL"
 POWER = "POWER"
 SOCWATCH = "SOCWATCH"
+PCIE = "PCIE"
 MODEL_OUTPUT = "MODEL_OUTPUT"
 MIN = "MIN"
 MAX = "MAX"
 MED = "MED"
 
-second_folder_list = ['etl', 'power', 'socwatch', 'pcie']
+second_folder_list = [ETL, POWER, SOCWATCH, PCIE]
 
 
 #BASE = os.getcwd()
@@ -164,13 +165,14 @@ picks = {'power_pick':MED, 'inferencingOnlyPower':False, 'sortSimilarData':False
 # it returns grand parent folder name
 #=========================================================================
 def getDatasetLabel(abs_path) :
-    folder_list = abs_path.split("\\")[:-1]
-    last_folder = folder_list[-1]
-    sl_lower = last_folder.lower()
-    if sl_lower == 'etl' or sl_lower == 'power' or sl_lower == 'socwatch':
-        return [folder_list[-3], folder_list[-2]]
+    folder_list = abs_path.split("\\")
+    folder_structure_detector = abs_path.split("\\")[:-1]
+    last_folder = folder_structure_detector[-1]
+    sl_upper = last_folder.upper()
+    if sl_upper in second_folder_list:
+        return [folder_list[-4], folder_list[-3]]
     else :
-        return [folder_list[-2], folder_list[-1]]
+        return [folder_list[-3], folder_list[-2]]
 
 def createDataset(abs_path) :
     # print("[abs_path] ", abs_path)
@@ -251,6 +253,8 @@ def add_pcie_only(abs_path):
     dataset = pullData(path_set[0])
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
+    if PCIE not in dataset["data_type"] :
+        dataset["data_type"].insert(0, PCIE)
     dataset["pcie_socwatch_obj"] = psoc.parsePCIe(abs_path, PCIe_targets)
     global file_num
     file_num += 1
@@ -275,8 +279,11 @@ def fileClassifier(abs_path, f):
         upto_path = tools.splitLastItem(abs_path, "\\", 1)[0]
         soc_summary = workload_name + ".csv"
         summary_fullPath = os.path.join(upto_path, soc_summary)
-        if os.path.exists(summary_fullPath) :
+        osSession_fullPath = os.path.join(upto_path, workload_name+"_osSession.etl")
+        if os.path.exists(summary_fullPath) and os.path.exists(osSession_fullPath):
             add_socwatch(summary_fullPath)
+        elif os.path.exists(summary_fullPath) and not os.path.exists(osSession_fullPath):
+            add_pcie_only(summary_fullPath)
         else :
             print("===== No Socwatch summary, Socwatch post-process may have interrupted", abs_path)
         file_type = CL_SOCWATCH
@@ -298,8 +305,8 @@ def detectAndParseFile(path) :
         else:
             #recursive on a folder detection
             path_sliced = tools.splitLastItem(abs_path, "\\", 1)
-            last_folder = path_sliced[1].lower()
-            if (last_folder != "etl" and last_folder != "power" and last_folder != "socwatch") and (pullData(abs_path) == None) :
+            last_folder = path_sliced[1].upper()
+            if last_folder not in second_folder_list and (pullData(abs_path) == None) :
                 createDataset(abs_path)
             detectAndParseFile(abs_path)
 
@@ -314,7 +321,7 @@ def main():
     # since it is keep improving, changing
     # ===========================================================================
     # print("====[hobl_sets]", hobl_sets)
-    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, DAQ_target, picks)
+    rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, PCIe_targets, picks)
 
 
 start_time = time.perf_counter()
