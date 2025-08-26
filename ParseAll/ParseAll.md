@@ -1,7 +1,7 @@
 
 
 # ParseAll.py : 
-This is developed to parse and summarize all ETL/Power/Socwatch/PCIe_Only data into one excel, to help the data selection process. Power comes first, if the power data collected with Socwatch or PCIe_only Socwatch, they will be parsed and presented in one column. currently ETL is not being post-processed. 
+This is developed to parse and summarize all ETL/Power/Socwatch/PCIe_Only data into one Excel file to help with the data selection process. Power comes first; if the power data is collected with Socwatch or PCIe-only Socwatch, they will be parsed and presented in one column. Currently, ETL is not being post-processed.
 
 
 
@@ -19,7 +19,7 @@ PS C:\Users\siwoopar\code\ParseCSV> py ParseAll.py -i \\255.255.255.255\Pnpext\S
 -----------------------------------------------------------------------------------------------------------------------------------------
 ##### [Folder Structure 1 (flat layer)]
 
-need to provide upto "Baseline" folder as a input and children folders are a flat level. each folder can be, ETL, Power, PCIe, or Socwatch
+It requires to provide upto "Baseline" folder as a input and children folders are a flat level. each folder can be, ETL, Power, PCIe, or Socwatch
 <pre>
 WW2534.1_somedata ├── Baseline ├── CataV3_000 (ETL + Power)
                                ├── CataV3_001 (Power)
