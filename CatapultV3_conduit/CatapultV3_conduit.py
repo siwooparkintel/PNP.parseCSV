@@ -44,25 +44,11 @@ SWP = [
         "condition":"CataV3+IT+BG+UHX2_10s",
         "data_summary_type": "expanded",
         "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_011\UHX2_DC_011_pacs-summary.csv",
-        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_009\socwatch\CataV3_noLC_009.csv",
-        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_007\sowatch\CataV3_noLC_007.csv"
+        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2534.1_CataV3ITCCAUHX2_L0MPHYL6\CataV3_PCDfix_002\socwatch\CataV3_002.csv",
+        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2534.1_CataV3ITCCAUHX2_L0MPHYL6\CataV3_PCDfix_004\socwatch\CataV3_004.csv"
     },
 ]
 
-    # {
-    #     "data_label":"CataV3+CCA+LCLT+UHX2",
-    #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_003_Ppick\web_cataV3_si_003\web_cataV3_si_003_pacs-summary.csv",
-    #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_004_Spick\socwatch\web_cataV3_si.csv",
-    #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_007_PCIe\socwatch\PCIeOnly_web_cataV3_si.csv"
-    # }
-
-    # {
-    #     "data_label":"CataV3 UHX2 baseline",
-    #     "condition":"CataV3+IT+BG+UHX2_10s",
-    #     "power_summary_path":r"\\10.54.63.126\Pnpext\Siwoo\data\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_011\UHX2_DC_011_pacs-summary.csv",
-    #     "socwatch_summary_path":r"\\10.54.63.126\Pnpext\Siwoo\data\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_009\socwatch\CataV3_noLC_009.csv",
-    #     "PCIe_socwatch_summary_path":r"\\10.54.63.126\Pnpext\Siwoo\data\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_007\sowatch\CataV3_noLC_007.csv"
-    # },
 
 #=============================================================================
 # place this same order of the socwatch summary for ultimate performance
@@ -101,7 +87,7 @@ socwatch_targets = [
     {"key": "NPU_Pstate", "lookup": "Neural Processing Unit (NPU) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "1900", "1901-2900", "2901-3899", "3900"]},
     {"key": "MEMSS_Pstate", "lookup": "Memory Subsystem (MEMSS) P-State Summary - Sampled: Approximated Residency (Percentage)"},
     {"key": "NoC_Pstate", "lookup": "Network on Chip (NoC) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["400", "401-1049", "1050"]},
-    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-1850", "1851-2049", "2050"]}
+    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0-399","400-650", "651-1299", "1300-1849", "1850-2050"]}
 ]
 
 PCIe_targets = [
