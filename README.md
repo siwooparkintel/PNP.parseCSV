@@ -1,9 +1,9 @@
 # Parsers / Summarizers
 ## for CPAD team (P3TMA)
 
-[ParseAll.py](./ParseAll/ParseAll.md) : This is developed to parse and summarize all ETL/Power/Socwatch/PCIe_Only data into one Excel file to help with the data selection process. Power comes first; if the power data is collected with Socwatch or PCIe-only Socwatch, they will be parsed and presented in one column. Currently, ETL is not being post-processed.
+[ParseAll.py](./ParseAll/) : This is developed to parse and summarize all ETL/Power/Socwatch/PCIe_Only data into one Excel file to help with the data selection process. Power comes first; if the power data is collected with Socwatch or PCIe-only Socwatch, they will be parsed and presented in one column. Currently, ETL is not being post-processed.
 
-[CatapultV3_conduit.py](./CatapultV3_conduit/CatapultV3_conduit.md) : This should be used after you have selected the data from the ParseAll.py report. Feed the selected Power, Socwatch, and PCIe-only socwatch summary file paths as a list of dictionary objects (JSON format). It will combine the power, socwatch, and PCIe-only socwatch summaries for the conduit data collateral. CPU P-states will be presented per core as requested by the projection team. You can hide (collapse) the 2nd to last cores in the unhighlighted past progression data to make the baseline and last progression data stand out more.
+[CatapultV3_conduit.py](./CatapultV3_conduit/) : This should be used after you have selected the data from the ParseAll.py report. Feed the selected Power, Socwatch, and PCIe-only socwatch summary file paths as a list of dictionary objects (JSON format). It will combine the power, socwatch, and PCIe-only socwatch summaries for the conduit data collateral. CPU P-states will be presented per core as requested by the projection team. You can hide (collapse) the 2nd to last cores in the unhighlighted past progression data to make the baseline and last progression data stand out more.
 
 ------------------------------------------------------------------------
 
