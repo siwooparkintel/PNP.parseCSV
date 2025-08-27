@@ -1,6 +1,7 @@
 
 import os
 import time
+import json
 from os import listdir
 from os.path import isfile, join
 import parsers.tools as tools
@@ -16,9 +17,13 @@ import argparse
 parser = argparse.ArgumentParser(prog='AI summary parser')
 parser.add_argument('-i', '--input', help='input path. this will be the bese of the summray, will detect all files and folders from that path tree')
 parser.add_argument('-o', '--output', help='output path. location of file and file name')
+parser.add_argument('-d', '--daq', help='DAQ power rail name dictionary')
+parser.add_argument('-s', '--socwatch', help='a list of dictionary objects that you want to parse from the socwatch summary')
 # parser.print_help()
 args = parser.parse_args()
 print("args: ", args)
+
+
 
 socwatch_targets = [
     {"key": "CPU_model", "lookup": "CPU native model"},
@@ -54,10 +59,6 @@ socwatch_targets = [
     {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-2049", "2050"]}
 ]
 
-"""
-
-"""
-
 
 PCIe_targets = [
     {"key": "PCIe_LPM", "devices":["NVM"], "lookup": "PCIe LPM Summary - Sampled: Approximated Residency (Percentage)"},
@@ -65,9 +66,7 @@ PCIe_targets = [
     {"key": "PCIe_LTRsnoop", "devices":["NVM"], "lookup": "PCIe LTR Snoop Summary - Sampled: Histogram"}
 ]
 
-"""
 
-"""
 DAQ_target = {
 "P_SSD":-1,
 "V_VAL_VCC_PCORE":-1,
@@ -122,6 +121,20 @@ second_folder_list = [ETL, POWER, SOCWATCH, PCIE]
 # BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data"
 BASE = args.input
 result_csv = args.output
+
+if args.daq is None:
+    print("============== No external DAQ.json provided")
+else :
+    with open(args.daq, 'r') as f:
+        DAQ_target = json.load(f)
+        print(DAQ_target)
+
+if args.socwatch is None:
+    print("============== No external Socwatch_target.json provided")
+else :
+    with open(args.soc, 'r') as f:
+        socwatch_targets = json.load(f)
+        print(socwatch_targets)
 
 
 

@@ -43,8 +43,8 @@ def parsePowerSummaryCSV(csv_path, DAQ_target) :
                 if t_rail[0]== target_rail:
                     power_data[target_rail] = float(t_rail[avr_index])
                     break
-
-        power_data['Energy (J)'] = power_data["P_SOC+MEMORY"] * power_data["Run Time"]
+        if "Run time" in power_data:
+            power_data['Energy (J)'] = power_data["P_SOC+MEMORY"] * power_data["Run Time"]
         # power_data['Eng(J)/Frame'] = None
 
         power_obj['file_path'] = csv_path
