@@ -9,11 +9,11 @@ This is developed to parse and summarize all ETL/Power/Socwatch/PCIe_Only data i
 ##### -i, --input [required] : full path to the folder
 ##### -o, --output [recommended]: full path to the output excel file location and filename prefix. "_allPower_v.xlsx" will be added in the file name.
 ##### -d, --daq [recommended]: full path and json file name. it externalizes the DAQ_target dictionary object as a json since each DAQ can have different power measure rail names.
-##### -s, --soc [optional]: full path and json file name that contains a list of dictionary object that contains "look up" text in the socwatch summary file to parse. if the dictionary has "buckets" list it will bucketize the p-states into defined range group.
+##### -s, --socwatch [optional]: full path and json file name that contains a list of dictionary object that contains "look up" text in the socwatch summary file to parse. if the dictionary has "buckets" list it will bucketize the p-states into defined range group.
 ##### [Powershell example]
 ```powershell
 
-PS C:\Users\siwoopar\code\ParseCSV> py ParseAll.py -i \\255.255.255.255\Pnpext\Siwoo\data\WW2526.5_CataV3_IT_CCA_LC\Baseline -o .\test\2nd_folders -d .\src\DAQ_target_09-04DUT.json
+PS C:\Users\siwoopar\code\ParseCSV> py ParseAll.py -i \\255.255.255.255\Pnpext\Siwoo\data\WW2526.5_CataV3_IT_CCA_LC\Baseline -o .\test\2nd_folders -d .\src\DAQ_target_09-04DUT.json -s .\src\Socwatch_targets.json
 
 ```
 
