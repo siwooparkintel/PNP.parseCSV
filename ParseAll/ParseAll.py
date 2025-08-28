@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(prog='AI summary parser')
 parser.add_argument('-i', '--input', help='input path. this will be the bese of the summray, will detect all files and folders from that path tree')
 parser.add_argument('-o', '--output', help='output path. location of file and file name')
 parser.add_argument('-d', '--daq', help='DAQ power rail name dictionary')
-parser.add_argument('-s', '--socwatch', help='a list of dictionary objects that you want to parse from the socwatch summary')
+parser.add_argument('-st', '--swtarget', help='a list of dictionary objects that you want to parse from the socwatch summary')
 # parser.print_help()
 args = parser.parse_args()
 print("args: ", args)
@@ -129,10 +129,10 @@ else :
         DAQ_target = json.load(f)
         print(DAQ_target)
 
-if args.socwatch is None:
+if args.swtarget is None:
     print("============== No external Socwatch_target.json provided")
 else :
-    with open(args.soc, 'r') as f:
+    with open(args.swtarget, 'r') as f:
         socwatch_targets = json.load(f)
         print(socwatch_targets)
 

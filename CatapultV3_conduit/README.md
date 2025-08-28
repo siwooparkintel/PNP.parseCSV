@@ -6,14 +6,14 @@ This should be used after you have selected the data from the ParseAll.py report
 ##### [Powershell example]
 ```powershell
 
-PS C:\Users\siwoopar\code\ParseCSV> py CatapultV3_conduit.py -i .\src\collection.json -o .\test\2nd_file_prefix -d .\src\DAQ_target_LNL09-04DUT.json -s .\src\Socwatch_targets.json
+PS C:\Users\siwoopar\code\ParseCSV> py CatapultV3_conduit.py -i .\src\collection.json -o .\test\2nd_file_prefix -d .\src\DAQ_target_LNL09-04DUT.json -st .\src\Socwatch_targets.json
 
 ```
 ### Arguments
 ##### -i, --input [optional] : You can omit it if you directly feed it in the CatapultV3_conduit.py as "collection" dictionary. Or full path to input .JSON file that has "data_label", "condition", "data_summary_type", "power_summary_path", "socwatch_summary_path", and "PCIe_socwatch_summary_path"
 ##### -o, --output [recommended] : full path to the output excel file location and filename prefix. "_allPower_v.xlsx" will be added in the file name.
 ##### -d, --daq [recommended]: full path and json file name. it externalizes the DAQ_target dictionary object as a json since each DAQ can have different power measure rail names.
-##### -s, --socwatch [optional]: full path and json file name that contains a list of dictionary object that contains "look up" text in the socwatch summary file to parse. if the dictionary has "buckets" list it will bucketize the p-states into defined range group.
+##### -st, --swtarget [optional]: full path and json file name that contains a list of dictionary object that contains "look up" text in the socwatch summary file to parse. if the dictionary has "buckets" list it will bucketize the p-states into defined range group.
 
 
 ### Collection of Selected Data (-i, --input)
@@ -90,7 +90,7 @@ DAQ_target = {
 
 ```
 
-### Socwatch Target Table List Adjustment (-s, --socwatch)
+### Socwatch Target Table List Adjustment (-st, --swtarget)
 
 If it is not provided, it uses an internally implemented target object, which works well. However, detection wording changes are possible by Socwatch developers. A user can add or remove the targeted socwatch summary table data here; bucketizing a large range of p-states is also possible. One important thing to get the best performance out of the parser is to match the order of the socwatch summary. If it is matched, it only loops once and parses every table together in that one loop. However, if not matched, it wastes the loop and loops again to check its existence.
 
