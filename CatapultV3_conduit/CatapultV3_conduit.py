@@ -17,13 +17,15 @@ import argparse
 parser = argparse.ArgumentParser(prog='Catapult V3 parser V1.0')
 parser.add_argument('-i', '--input', help='input path. this will be the bese of the summray, will detect all files and folders from that path tree')
 parser.add_argument('-o', '--output', help='output path. location of file and file name')
+parser.add_argument('-d', '--daq', help='DAQ power rail name dictionary')
+parser.add_argument('-s', '--socwatch', help='a list of dictionary objects that you want to parse from the socwatch summary')
 # parser.print_help()
 args = parser.parse_args()
 print("args: ", args)
 
 
 
-SWP = [
+collection = [
     {
         "data_label":"CataV3 UHX1",
         "condition":"CataV3+UHX1",
@@ -157,9 +159,23 @@ if args.input is None:
     print("============== No input")
 else :
     with open(args.input, 'r') as f:
-        SWP = json.load(f)
-        print(SWP)
+        collection = json.load(f)
+        print(collection)
 
+if args.daq is None:
+    print("============== No external DAQ.json provided")
+else :
+    with open(args.daq, 'r') as f:
+        DAQ_target = json.load(f)
+        print(DAQ_target)
+
+if args.socwatch is None:
+    print("============== No external Socwatch_target.json provided")
+else :
+    with open(args.soc, 'r') as f:
+        socwatch_targets = json.load(f)
+        print(socwatch_targets)
+        
 if result_csv == None : 
     result_csv = f"{BASE}\\CataV3_summary"
 
@@ -197,6 +213,7 @@ def createDataset(tdic) :
     hobl_sets.append({
         "data_label":tdic["data_label"],
         "condition":tdic["condition"],
+        "data_summary_type": tdic['data_summary_type'],
         "data_type":[]
     })
 
@@ -304,7 +321,7 @@ def detectAndParseFile(file_list) :
 
 def main():
 
-    detectAndParseFile(SWP)
+    detectAndParseFile(collection)
     # pck.checkAndMarkPower(hobl_sets, picks)
     # if (picks["inferencing_power"] is True) : 
     # ptp.averageInferencingPower(hobl_sets, DAQ_target)

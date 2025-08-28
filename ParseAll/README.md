@@ -42,11 +42,11 @@ WW2534.1_somedata ├── Baseline  ├── ETL          └── CataV3_00
 ##### [Powershell example]
 ```powershell
 
-PS C:\Users\siwoopar\code\ParseCSV> py ParseAll.py -i \\255.255.255.255\Pnpext\Siwoo\data\WW2526.5_CataV3_IT_CCA_LC\Baseline -o .\test\2nd_folders -d .\src\DAQ_target_09-04DUT.json -s .\src\Socwatch_targets.json
+PS C:\Users\siwoopar\code\ParseCSV> py ParseAll.py -i \\255.255.255.255\Pnpext\Siwoo\data\WW2526.5_CataV3_IT_CCA_LC\Baseline -o .\test\2nd_folders -d .\src\DAQ_target_LNL09-04DUT.json -s .\src\Socwatch_targets.json
 
 ```
 
-### DAQ Rail Name Adjustment
+### DAQ Rail Name Adjustment (-d, --daq)
 
 Each DAQ power rail name can be different. To summarize the targeted rails, modify the "DAQ_target" object in ParseAll.py or provide the -d flag with the full path and JSON file name. Lastly if you add "Rum Time" in the DAQ_target, it will provide the total energy (J) used during the workload.
 
@@ -82,7 +82,7 @@ DAQ_target = {
 
 ```
 
-### Socwatch Target Table List Adjustment
+### Socwatch Target Table List Adjustment (-s, --socwatch)
 
 If it is not provided, it uses an internally implemented target object, which works well. However, detection wording changes are possible by Socwatch developers. A user can add or remove the targeted socwatch summary table data here; bucketizing a large range of p-states is also possible. One important thing to get the best performance out of the parser is to match the order of the socwatch summary. If it is matched, it only loops once and parses every table together in that one loop. However, if not matched, it wastes the loop and loops again to check its existence.
 
