@@ -39,6 +39,7 @@ WW2534.1_somedata ├── Baseline  ├── ETL          └── CataV3_00
 ##### -o, --output [recommended]: full path to the output excel file location and filename prefix. "_allPower_v.xlsx" will be added in the file name.
 ##### -d, --daq [recommended]: full path and json file name. it externalizes the DAQ_target dictionary object as a json since each DAQ can have different power measure rail names.
 ##### -st, --swtarget [optional]: full path and json file name that contains a list of dictionary object that contains "look up" text in the socwatch summary file to parse. if the dictionary has "buckets" list it will bucketize the p-states into defined range group.
+##### -hb, --hobl [optional]: If data is collected through HOBL, it should have .PASS or .FAIL empty file, and using them to set a data group is much more accurate, so recommended to use it if it is collected via HOBL. 
 ##### [Powershell example]
 ```powershell
 
@@ -124,7 +125,7 @@ socwatch_targets = [
 
 ```
 
-
+### HOBL or Non-HOBL data (-hb, --hobl) If the data is collected via HOBL, using this option to improve the data detection. It is empty flag, add it if it is hobl data or omit it if not.
 
 
 

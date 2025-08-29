@@ -19,6 +19,8 @@ parser.add_argument('-i', '--input', help='input path. this will be the bese of 
 parser.add_argument('-o', '--output', help='output path. location of file and file name')
 parser.add_argument('-d', '--daq', help='DAQ power rail name dictionary')
 parser.add_argument('-st', '--swtarget', help='a list of dictionary objects that you want to parse from the socwatch summary')
+parser.add_argument('-hb', '--hobl', action='store_true', help='if the data is collected via HOBL, looking for .PASS or .FAIL file in the folder to set file path as data set ID')
+
 # parser.print_help()
 args = parser.parse_args()
 print("args: ", args)
@@ -100,10 +102,12 @@ CL_UNCLASSIFIED = "unclassified"
 CL_ETL = ".etl"
 CL_OUTPUT = '_output.txt'
 CL_SOCWATCH = 'Session.etl'
+CL_SOCWATCH_CSV = "socwatch.csv"
 CL_AI_MODEL = '_qdq_proxy_'
 CL_DAQ_SUMMARY = 'pacs-summary.csv'
 CL_DAQ_TRACES = 'pacs-traces'
-
+CL_PASS = ".PASS"
+CL_FAIL = ".FAIL"
 
 ETL = "ETL"
 POWER = "POWER"
@@ -136,7 +140,7 @@ else :
         socwatch_targets = json.load(f)
         print(socwatch_targets)
 
-
+print("===== args hobl: ", args.hobl)
 
 if result_csv == None : 
     result_csv = f"{BASE}\\parseAll"
@@ -277,7 +281,9 @@ def fileClassifier(abs_path, f):
 
     file_type = CL_UNCLASSIFIED
     
-    if f.find(CL_ETL) >= 0 and f.find(CL_SOCWATCH) == -1 : 
+    if args.hobl == True and (f == CL_PASS or f == CL_FAIL):
+        createDataset(tools.splitLastItem(abs_path, "\\", 1)[0])
+    elif f.find(CL_ETL) >= 0 and f.find(CL_SOCWATCH) == -1 : 
         # print("ETL detected ", abs_path, f)
         add_etl(abs_path)
         file_type = CL_ETL
@@ -295,11 +301,17 @@ def fileClassifier(abs_path, f):
         osSession_fullPath = os.path.join(upto_path, workload_name+"_osSession.etl")
         if os.path.exists(summary_fullPath) and os.path.exists(osSession_fullPath):
             add_socwatch(summary_fullPath)
+            file_type = CL_SOCWATCH
         elif os.path.exists(summary_fullPath) and not os.path.exists(osSession_fullPath):
             add_pcie_only(summary_fullPath)
+            file_type = CL_SOCWATCH
         else :
-            print("===== No Socwatch summary, Socwatch post-process may have interrupted", abs_path)
-        file_type = CL_SOCWATCH
+            print("===== No Socwatch summary, Socwatch post-process may have interrupted or socwatch summary file name has altered", abs_path)
+        
+    elif f.lower().find(CL_SOCWATCH_CSV) >= 0:
+        # file_size = os.path.getsize(abs_path)
+        add_socwatch(abs_path)
+        file_type = CL_SOCWATCH_CSV
     return file_type
 
 
@@ -315,12 +327,14 @@ def detectAndParseFile(path) :
             if fType == CL_SOCWATCH :
                 # after detecting first Socwatch ETL, and it's summary, no need to go further
                 break
-        else:
+        elif f != "MSTeamsLogs" and f != "Training":
+            # only creates data set if not collected through HOBL. 
+            if args.hobl == None or args.hobl == False:
+                path_sliced = tools.splitLastItem(abs_path, "\\", 1)
+                last_folder = path_sliced[1].upper()
+                if last_folder not in second_folder_list and (pullData(abs_path) == None) :
+                    createDataset(abs_path)
             #recursive on a folder detection
-            path_sliced = tools.splitLastItem(abs_path, "\\", 1)
-            last_folder = path_sliced[1].upper()
-            if last_folder not in second_folder_list and (pullData(abs_path) == None) :
-                createDataset(abs_path)
             detectAndParseFile(abs_path)
 
 def main():
