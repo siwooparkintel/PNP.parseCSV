@@ -125,7 +125,8 @@ socwatch_targets = [
 
 ```
 
-### HOBL or Non-HOBL data (-hb, --hobl) If the data is collected via HOBL, using this option to improve the data detection. It is empty flag, add it if it is hobl data or omit it if not.
+### HOBL or Non-HOBL data (-hb, --hobl)
+If the data is collected via HOBL, using this option to improve the data detection. It is empty flag, add it if it is hobl data or omit it if not.
 
 
 
