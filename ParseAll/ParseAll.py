@@ -341,12 +341,6 @@ def main():
 
     detectAndParseFile(BASE)
     pck.checkAndMarkPower(hobl_sets, picks)
-    # if (picks["inferencing_power"] is True) : 
-    # ptp.averageInferencingPower(hobl_sets, DAQ_target)
-    # ===========================================================================
-    # print processed(fully parsed) data to check the dictionary (Object) structure
-    # since it is keep improving, changing
-    # ===========================================================================
     # print("====[hobl_sets]", hobl_sets)
     rpt.writeParsedInCSV(result_csv, hobl_sets, socwatch_targets, PCIe_targets, picks)
 
