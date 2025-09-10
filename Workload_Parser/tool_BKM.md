@@ -8,7 +8,7 @@
 #### (4) Signup for Github [Github Signup](https://github.com/) 
 
 Recommend to download Windows/x64 Setup if you are on a Intel/Windows System.
-Install all downloaded installers. During the installation, default section will be good enough but recommend to choose "VS code" as GIT editor instead of VIM.
+Install all downloaded installers. During the installation, default selection will be good enough but recommend to choose "VS code" as GIT editor instead of VIM.
 Signup for Github to download the codebase.
 
 
