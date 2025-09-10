@@ -4,13 +4,16 @@ import time
 from os import listdir
 from os.path import isfile, join
 import parsers.tools as tools
+
 import parsers.pcie_socwatch_summary_parser as psoc
 import parsers.socwatch_summary_parser as soc
 import parsers.power_summary_parser as psp
 import parsers.power_trace_parser as ptp
 import parsers.sync_time_parser as stp
 import parsers.power_checker as pck
+import parsers.ETL_parser as etl
 import parsers.reporter as rpt
+
 
 import argparse
 
@@ -190,7 +193,6 @@ def pullData(abs_path) :
             return item
     return None
 
-
 def add_etl(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
     dataset = pullData(path_set[0])
@@ -198,17 +200,9 @@ def add_etl(abs_path):
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
     if ETL not in dataset["data_type"] :
         dataset["data_type"].insert(0, ETL)
-    dataset["etl_path"] = abs_path
-
-# def add_model_output(abs_path):
-#     path_set = tools.splitLastItem(abs_path, "\\", 1)
-#     dataset = pullData(path_set[0])
-#     if dataset == None:
-#         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
-#     dataset["model_output_obj"] = mop.parseModelResults(abs_path, AI_parsing_items)
-#     calFromPowerModel(dataset)
-#     global file_num
-#     file_num += 1
+    dataset["etl_obj"] = etl.parseETL(abs_path)
+    global file_num
+    file_num += 1
 
 def add_power(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
@@ -274,108 +268,6 @@ def sync_times(tdic):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def getDatasetLabel(abs_path) :
-#     folder_list = abs_path.split("\\")[:-1]
-#     last = folder_list[-1]
-#     last_lower = last.lower()
-#     if last_lower == 'etl' or last_lower == 'power' or last_lower == 'socwatch':
-#         return [folder_list[-3], folder_list[-2]]
-#     else :
-#         return [folder_list[-2], folder_list[-1]]
-
-# def createDataset(tdic) :
-#     hobl_sets.append({
-#         "data_label":tdic["data_label"],
-#         "condition":tdic["condition"],
-#         "data_summary_type": tdic['data_summary_type'],
-#         "data_type":[]
-#     })
-
-# def pullData(ID) :
-#     for item in hobl_sets:
-#         if (item["condition"] == ID) : 
-#             return item
-#     return None
-
-# def add_etl(tdic):
-#     ID = tdic['condition']
-#     dataset = pullData(ID)
-#     if dataset == None:
-#         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
-#     if ETL not in dataset["data_type"] :
-#         dataset["data_type"].insert(0, ETL)
-#     dataset["etl_path"] = tdic['power_summary_path']
-
-# def add_power(tdic):
-#     ID = tdic['condition']
-#     dataset = pullData(ID)
-#     if dataset == None:
-#         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
-#     if POWER not in dataset["data_type"] :
-#         dataset["data_type"].append(POWER)
-#     dataset["power_obj"] = psp.parsePowerSummaryCSV(tdic['power_summary_path'], DAQ_target)
-
-#     global file_num
-#     file_num += 1
-
-# def add_trace(tdic):
-#     ID = tdic['condition']
-#     dataset = pullData(ID)
-#     if dataset == None:
-#         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
-#     dataset["trace_obj"] = ptp.parsePowerTraceCSV(tdic['power_trace_path'])
-#     global file_num
-#     file_num += 1
-
-# def sync_times(tdic):
-#     ID = tdic['condition']
-#     dataset = pullData(ID)
-#     if dataset == None:
-#         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
-#     dataset["host_dut_sync_obj"] = stp.parseLogs(tdic, SYNC_targets, dataset['trace_obj'])
-
-#     global file_num
-#     file_num += 3
-
-# def add_socwatch(tdic):
-#     ID = tdic['condition']
-#     dataset = pullData(ID)
-#     if dataset == None:
-#         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
-#     if SOCWATCH not in dataset["data_type"] :
-#         dataset["data_type"].insert(0, SOCWATCH)
-#     dataset["socwatch_obj"] = soc.parseSocwatch(tdic, socwatch_targets)
-#     global file_num
-#     file_num += 1
-
-# def add_pcie_only(tdic):
-#     ID = tdic['condition']
-#     dataset = pullData(ID)
-#     if dataset == None:
-#         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
-#     dataset["pcie_socwatch_obj"] = psoc.parsePCIe(tdic, PCIe_targets)
-#     global file_num
-#     file_num += 1
-
-
 def fileClassifier(abs_path, f):
 
     file_type = CL_UNCLASSIFIED
@@ -439,30 +331,10 @@ def detectAndParseFile(path) :
             #recursive on a folder detection
             detectAndParseFile(abs_path)
 
-# def detectAndParseFiles(file_list) :
 
-#     for tdic in file_list:
-#         if "data_label" in tdic:
-#             # print(tdic["data_label"])
-#             createDataset(tdic)    
-#         if "power_trace_path" in tdic:
-#             # print(tdic["power_summary_path"])
-#             add_trace(tdic)
-#         if "host_log" in tdic and "dut_log" in tdic:
-#             # print("[log file for time sync? yes they are]")
-#             sync_times(tdic)    
-#         if "power_summary_path" in tdic:
-#             # print(tdic["power_summary_path"])
-#             add_power(tdic)
-#         if "socwatch_summary_path" in tdic:
-#             # print(tdic["socwatch_summary_path"])
-#             add_socwatch(tdic)
-#         if "PCIe_socwatch_summary_path" in tdic:
-#             # print("PCIe parser")
-#             add_pcie_only(tdic)
 
 def main():
-
+    detectAndParseFile(collection["selected_etl_folder"])
     detectAndParseFile(collection["selected_power_folder"])
     detectAndParseFile(collection["selected_socwatch_folder"])
     detectAndParseFile(collection["selected_PCIe_folder"])

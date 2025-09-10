@@ -1,10 +1,55 @@
-# BKM
-### If you need more detailed step by step
-=> [Tool BKM](./tool_BKM.md)
+
+# BKM : 
+
+### 0. Prerequisite
+#### (1) Install Python [Python Download](https://www.python.org/downloads/)
+#### (2) Install VS Code [VS Code Download(System,x64 on Windows)](https://code.visualstudio.com/download)
+#### (3) Install Git [GIT Download](https://git-scm.com/downloads/win)
+#### (4) Signup for Github [Github Signup](https://github.com/) 
+
+Recommend to download Windows/x64 Setup if you are on a Intel/Windows System.
+Install all downloaded installers. During the installation, default section will be good enough but recommend to choose "VS code" as GIT editor instead of VIM.
+Signup for Github to download the codebase.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+### 1. Clone the code from Github
+```powershell
+
+PS C:\Users\YOURNAME\code>git clone https://github.com/siwooparkintel/PNP.parseCSV.git
+
+Cloning into 'PNP.parseCSV'...
+remote: Enumerating objects: 445, done.
+remote: Counting objects: 100% (4/4), done.
+remote: Compressing objects: 100% (4/4), done.
+Receie: Total 445 (delta 0), reused 1 (delta 0), pack-reused 441 (from 1)R             cts:  95% (423/445)
+Receiving objects: 100% (445/445), 286.01 KiB | 1.55 MiB/s, done.
+Resolving deltas: 100% (258/258), done.
+
+```
+
+# Workload_Parser Folder
+## Among the many, "Workload_Parser" is the one folder that all small parsers are integrated, including "ParseAll.py" and "Collection_Parser.py"
+
+
+
+
+
+
+
 
 
 # ParseAll.py : 
 This is developed to parse and summarize all ETL/Power/Socwatch/PCIe_Only data into one Excel file to help with the data selection process. Power comes first; if the power data is collected with Socwatch or PCIe-only Socwatch, they will be parsed and presented in one column. Currently, ETL is not being post-processed.
+
+##### [Powershell example]
+```powershell
+
+PS C:\Users\YOURNAME\ParseCSV\Workload_Parser> py ParseAll.py -i \\255.255.255.255\Pnpext\Siwoo\data\WW2526.5_CataV3_IT_CCA_LC\Baseline -o .\test\2nd_folders -d .\src\DAQ_target_LNL09-04DUT.json -st .\src\Socwatch_targets.json
+
+```
 
 ### Acceptable Folder Structures
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -43,12 +88,7 @@ WW2534.1_somedata ├── Baseline  ├── ETL          └── CataV3_00
 ##### -d, --daq [recommended]: full path and json file name. it externalizes the DAQ_target dictionary object as a json since each DAQ can have different power measure rail names.
 ##### -st, --swtarget [optional]: full path and json file name that contains a list of dictionary object that contains "look up" text in the socwatch summary file to parse. if the dictionary has "buckets" list it will bucketize the p-states into defined range group.
 ##### -hb, --hobl [optional]: If data is collected through HOBL, it should have .PASS or .FAIL empty file, and using them to set a data group is much more accurate, so recommended to use it if it is collected via HOBL. 
-##### [Powershell example]
-```powershell
 
-PS C:\Users\siwoopar\code\ParseCSV> py ParseAll.py -i \\255.255.255.255\Pnpext\Siwoo\data\WW2526.5_CataV3_IT_CCA_LC\Baseline -o .\test\2nd_folders -d .\src\DAQ_target_LNL09-04DUT.json -st .\src\Socwatch_targets.json
-
-```
 
 ### DAQ Rail Name Adjustment (-d, --daq)
 
@@ -144,7 +184,7 @@ This should be used after you have selected the data from the ParseAll.py report
 ##### [Powershell example]
 ```powershell
 
-PS C:\Users\siwoopar\code\ParseCSV\Workload_Parser> py Collection_Parser.py -i .\src\collection.json -o .\test\2nd_file_prefix -d .\src\DAQ_target_LNL09-04DUT.json -st .\src\Socwatch_targets.json
+PS C:\Users\YOURNAME\ParseCSV\Workload_Parser> py Collection_Parser.py -i .\src\collection.json -o .\test\2nd_file_prefix -d .\src\DAQ_target_LNL09-04DUT.json -st .\src\Socwatch_targets.json
 
 ```
 ### Arguments
