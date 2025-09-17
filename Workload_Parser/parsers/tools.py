@@ -78,7 +78,7 @@ def flatten_power_dic(entry, picks):
         return {}
     
 def flatten_trace_dic(entry):
-    if "trace_obj" in entry and "trace_data" in entry["trace_obj"] :
+    if "trace_obj" in entry and "trace_data" in entry["trace_obj"] and entry["trace_obj"]["trace_data"] != None:
         copied = entry["trace_obj"]['trace_data'].copy()
         copied["total_row"] = entry['trace_obj']['total_row']
         copied["duration_in_scale"] = entry['trace_obj']['duration_in_scale']

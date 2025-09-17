@@ -1,4 +1,5 @@
 import os
+import time
 from pathlib import Path
 import parsers.tools as tools
 import parsers.ETLFirstEventParserByPS as ETLF
@@ -22,40 +23,45 @@ def filetime_to_epoch(filetime):
     return (filetime - FILETIME_EPOCH_DIFF) / FILETIME_TO_MILLISECONDS
 
 
+def isEpochMilliseconds(value):
+    epoch = float(str(value).strip())
+    if 1e10 <= epoch <= 4102444800000:
+        return True
+    else :
+        return False
 
 
-
-
-
-def parseETL(etl_path) :
+def parseETL(etl_path, collection) :
     
-    data = {}
+    etl_data = dict()
+    etl_obj = {
+        "etl_data":etl_data,
+        "etl_path":etl_path
+    }
 
-    extractor = ETLF.ETLHighPrecisionTimeExtractor()
+    # extractor = ETLF.ETLHighPrecisionTimeExtractor()
     
-    # BASE = os.getcwd() #'C:\\Users\\siwoopar\\code\\parseCSV'
-    # etl_file = os.path.join(BASE, "\\test\\web_cataV3ff_si.etl")
+    # if "socwatch_first_event_epoch_milli" in collection and isEpochMilliseconds(collection["socwatch_first_event_epoch_milli"]):
+    #     etl_data["socwatch_first_event_epoch_milli"] = collection["socwatch_first_event_epoch_milli"]
+    #     return etl_obj
 
-    try:
-        #Get all timestamp formats
-        timestamp_dict = extractor.get_first_event_times(etl_path)
+    # try:
+    #     #Get all timestamp formats
+    #     print(f"[ETL Parsing...] {etl_path}")
+    #     start_time = time.perf_counter()
+    #     # timestamp_dict = extractor.get_first_event_times(etl_path)
+    #     epoch = extractor.get_quick_first_event(etl_path)
+    #     end_time = time.perf_counter()
+    #     elapsed_time = end_time - start_time
+    #     print(f"[Epoch: {epoch}] {etl_path} file parsed Successful! [Elapsed time:::] {elapsed_time} seconds")
         
-        if timestamp_dict:
-            print("First Event Timestamps:")
-            print(f"Original DateTime: {timestamp_dict['datetime_original']}")
-            print(f"FILETIME: {timestamp_dict['filetime']}")
-            print(f"Unix Epoch (milliseconds): {timestamp_dict['epoch_milliseconds']}")
+    # except Exception as e:
+    #     print(f"Error: {e}")
 
-        
-        # Or get just FILETIME (faster)
-        # filetime = extractor.get_filetime_only(etl_file)
-        # print(f"\nFILETIME only: {filetime}")
-        
-    except Exception as e:
-        print(f"Error: {e}")
 
-    data.update(timestamp_dict)
-    return data
+    # etl_data["socwatch_first_event_epoch_milli"] = epoch
+    
+    return etl_obj
         
 
 

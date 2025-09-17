@@ -165,7 +165,7 @@ def averageInferencingPower(filtered_data, DAQ_target) :
                     block["trace_obj"]["inf_start"] = infer_start_idx
                     block["trace_obj"]["inf_end"] = infer_end_idx
                     block["trace_obj"]["trace_data"] = getAveragePowerByRails(csv_list[infer_start_idx:infer_end_idx], time_scale, target_obj, block["model_output_obj"]["model_output_data"]["throughput"][0])
-                    # print("========", block["trace_obj"]["trace_data"])
+                    print("========", block["trace_obj"]["trace_data"])
         else :
             # print("[Missing essential data]", )
             pass

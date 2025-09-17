@@ -30,6 +30,17 @@ Resolving deltas: 100% (258/258), done.
 
 ```
 
+### 2. Install Pandas & Openpyxl
+#### You may need to install Pandas and Openpyxl library if you don't have them already
+```powershell
+
+pip install pandas openpyxl
+
+#or install requirements.txt
+pip install -r requirements.txt
+
+```
+
 # Workload_Parser Folder
 ## Among the many, "Workload_Parser" is the one folder that all small parsers are integrated, including "ParseAll.py" and "Collection_Parser.py"
 

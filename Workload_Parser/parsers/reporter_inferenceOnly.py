@@ -16,7 +16,7 @@ def getTraceObject(hobl_data, DAQ_target) :
         
 
 def flatten_trace_data(entry):
-    flattened = {'Condition': entry['data_label'], 'data_label': entry['data_label']}
+    flattened = {'Condition': entry['data_label'][0], 'data_label': entry['data_label'][1]}
     flattened.update(tools.flatten_trace_dic(entry))
     return flattened
         

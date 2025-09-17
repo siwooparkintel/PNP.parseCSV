@@ -1,27 +1,22 @@
+
 import os
-import json
 import time
+import json
 from os import listdir
 from os.path import isfile, join
 import parsers.tools as tools
-
+import parsers.bm_llama_output_parser as lop
 import parsers.pcie_socwatch_summary_parser as psoc
 import parsers.socwatch_summary_parser as soc
 import parsers.power_summary_parser as psp
 import parsers.power_trace_parser as ptp
-import parsers.sync_time_parser as stp
-import parsers.ETL_power_slicer as eps
 import parsers.power_checker as pck
-import parsers.ETL_parser as etl
 import parsers.reporter as rpt
-
-
-
 
 import argparse
 
-parser = argparse.ArgumentParser(prog='Catapult V3 Full Parser V1.0')
-parser.add_argument('-i', '--input', help='input path. Catapult V3 Full Parser needs multiple log files to sync Host and DUT, also ICOB.exe output files to web sites break downs, all path will be fed as JSON format')
+parser = argparse.ArgumentParser(prog='AI summary parser')
+parser.add_argument('-i', '--input', help='input path. this will be the bese of the summray, will detect all files and folders from that path tree')
 parser.add_argument('-o', '--output', help='output path. location of file and file name')
 parser.add_argument('-d', '--daq', help='DAQ power rail name dictionary')
 parser.add_argument('-st', '--swtarget', help='a list of dictionary objects that you want to parse from the socwatch summary')
@@ -32,10 +27,9 @@ args = parser.parse_args()
 print("args: ", args)
 
 
+
 socwatch_targets = [
     {"key": "CPU_model", "lookup": "CPU native model"},
-    {"key": "PCH_SLP50", "lookup": "PCH SLP-S0 State Summary: Residency (Percentage and Time)"},
-    {"key": "S0ix_Substate", "lookup": "S0ix Substate Summary: Residency (Percentage and Time)"},
     {"key": "PKG_Cstate", "lookup": "Platform Monitoring Technology CPU Package C-States Residency Summary: Residency (Percentage and Time)"},
     {"key": "Core_Cstate", "lookup": "Core C-State Summary: Residency (Percentage and Time)"},
     {"key": "Core_Concurrency", "lookup": "CPU Core Concurrency (OS)"},
@@ -57,14 +51,12 @@ socwatch_targets = [
     {"key": "CPU_temp", "lookup": "Temperature Metrics Summary - Sampled: Min/Max/Avg"},
     {"key": "SoC_temp", "lookup": "SoC Domain Temperatures Summary - Sampled: Min/Max/Avg"},
     {"key": "NPU_Dstate", "lookup": "Neural Processing Unit (NPU) D-State Residency Summary: Residency (Percentage and Time)"},
-    {"key": "PMC+SLP_S0", "lookup": "PCH Active State (as percentage of PMC Active plus SLP_S0 Time) Summary: Residency (Percentage)"},
-    {"key": "DC_count", "lookup": "Dynamic Display State Enabling"},
     {"key": "Media_Cstate", "lookup": "Media C-State Residency Summary: Residency (Percentage and Time)"},
     {"key": "NPU_Pstate", "lookup": "Neural Processing Unit (NPU) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "1900", "1901-2900", "2901-3899", "3900"]},
     {"key": "MEMSS_Pstate", "lookup": "Memory Subsystem (MEMSS) P-State Summary - Sampled: Approximated Residency (Percentage)"},
-    {"key": "NoC_Pstate", "lookup": "Network on Chip (NoC) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["400", "401-1049", "1050"]},
-    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0-399","400-650", "651-1299", "1300-1849", "1850-2050"]}
+    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-2049", "2050"]}
 ]
+
 
 PCIe_targets = [
     {"key": "PCIe_LPM", "devices":["NVM"], "lookup": "PCIe LPM Summary - Sampled: Approximated Residency (Percentage)"},
@@ -72,15 +64,13 @@ PCIe_targets = [
     {"key": "PCIe_LTRsnoop", "devices":["NVM"], "lookup": "PCIe LTR Snoop Summary - Sampled: Histogram"}
 ]
 
-SYNC_targets = {
-    "host_log_target": "DEBUG call_rpc:45  sending RPC:",
-    "dut_log_target": "DEBUG Received json:",
-    "scenario_start_target":"Executing - Scenario:",
-    "scenario_end_target":"Completed - Scenario:",
-    "DAQ_start_target": "Record phase time: DAQ start time",
-    "DAQ_stop_target": "Record phase time: DAQ stop time",
-    "DAQ_timestamp_mark": "INFO"
-}
+
+BM_parsing_items = [
+    {"key": "Pipeline init time", "lookup": "[ INFO ] Pipeline initialization time: ", "unit":"s"},
+    {"key": "Inference count", "lookup": "inference count: ", "unit":""},
+    {"key": "Average", "lookup": "[ INFO ] [Average] P[", "unit":"string"}
+]
+
 
 DAQ_target = {
 "P_SSD":-1,
@@ -110,14 +100,15 @@ DAQ_target = {
 "Run Time":-1
 }
 
+
 CL_UNCLASSIFIED = "unclassified"
 CL_ETL = ".etl"
+CL_OUTPUT = '_output.txt'
 CL_SOCWATCH = 'Session.etl'
+CL_SOCWATCH_CSV = "socwatch.csv"
+CL_AI_MODEL = '_qdq_proxy_'
 CL_DAQ_SUMMARY = 'pacs-summary.csv'
 CL_DAQ_TRACES = 'pacs-traces'
-CL_HOBL = "hobl.log"
-CL_SIMPLE_REMOTE = "simple_remote_"
-CL_CATA_OUTPUT = 'CataV3_output.txt'
 CL_PASS = ".PASS"
 CL_FAIL = ".FAIL"
 
@@ -125,22 +116,18 @@ ETL = "ETL"
 POWER = "POWER"
 SOCWATCH = "SOCWATCH"
 PCIE = "PCIE"
+MODEL_OUTPUT = "MODEL_OUTPUT"
 MIN = "MIN"
 MAX = "MAX"
 MED = "MED"
 
 second_folder_list = [ETL, POWER, SOCWATCH, PCIE]
 
-collection = args.input
-result_path = args.output
 
-
-if args.input is None:
-    print("============== No input")
-else :
-    with open(args.input, 'r') as f:
-        collection = json.load(f)
-        print(collection)
+#BASE = os.getcwd()
+# BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data"
+BASE = args.input
+result_csv = args.output
 
 if args.daq is None:
     print("============== No external DAQ.json provided")
@@ -155,12 +142,12 @@ else :
     with open(args.swtarget, 'r') as f:
         socwatch_targets = json.load(f)
         print(socwatch_targets)
-        
-if result_path == None : 
-    result_path = f"{tools.splitLastItem(collection, "\\", -1)[0]}\\CataV3_full_summary"
 
+print("===== args hobl: ", args.hobl)
 
-picks = {'power_pick':MED, 'inferencingOnlyPower':False, 'sortSimilarData':False}
+if result_csv == None : 
+    result_csv = f"{BASE}\\parseAll"
+
 
 
 
@@ -170,17 +157,28 @@ file_num = 0
 
 
 
+picks = {'power_pick':MED, 'inferencingOnlyPower':False, 'sortSimilarData':False}
 
 
+
+
+
+
+    
+#=========================================================================
+# this returns parent or parent*2 folder name string as a data_set name
+# if ETL, Power, Socwatch folder separation structure,
+# it returns grand parent folder name
+#=========================================================================
 def getDatasetLabel(abs_path) :
     folder_list = abs_path.split("\\")
     folder_structure_detector = abs_path.split("\\")[:-1]
     last_folder = folder_structure_detector[-1]
     sl_upper = last_folder.upper()
     if sl_upper in second_folder_list:
-        return [folder_list[-3], folder_list[-2]]
+        return [folder_list[-4], folder_list[-3]]
     else :
-        return [folder_list[-2], folder_list[-1]]
+        return [folder_list[-3], folder_list[-2]]
 
 def createDataset(abs_path) :
     # print("[abs_path] ", abs_path)
@@ -196,6 +194,15 @@ def pullData(abs_path) :
             return item
     return None
 
+def calFromPowerModel(block) :
+    if 'power_obj' in block and 'model_output_obj' in block :
+        if 'power_data' in block['power_obj'] and block['model_output_obj']['model_output_status'] != "failed" and 'model_output_data' in block['model_output_obj']:
+            # calculate 'Eng(J)/Frame' here
+            block['power_obj']['power_data']['Eng(J)/Frame'] = block['power_obj']['power_data']['Energy (J)'] / block['model_output_obj']['model_output_data']['throughput'][0]
+        else :
+            # tools.errorAndExit("===error in claFromPowerModel===" + str(block))
+            block['power_obj']['power_data']['Eng(J)/Frame'] = "n/a"
+
 def add_etl(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
     dataset = pullData(path_set[0])
@@ -203,9 +210,15 @@ def add_etl(abs_path):
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
     if ETL not in dataset["data_type"] :
         dataset["data_type"].insert(0, ETL)
-    dataset["etl_obj"] = etl.parseETL(abs_path, collection)
-    # if "host_dut_sync_obj" in dataset and "CataV3_data" in dataset["host_dut_sync_obj"] :
-    #     sliced_list = eps.slice_power_ETL(dataset, collection)
+    dataset["etl_path"] = abs_path
+
+def add_model_output(abs_path):
+    path_set = tools.splitLastItem(abs_path, "\\", 1)
+    dataset = pullData(path_set[0])
+    if dataset == None:
+        tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
+    dataset["model_output_obj"] = lop.parseModelResults(abs_path, BM_parsing_items)
+    # calFromPowerModel(dataset)
     global file_num
     file_num += 1
 
@@ -227,14 +240,10 @@ def add_trace(abs_path):
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
     dataset["trace_obj"] = ptp.parsePowerTraceCSV(abs_path)
-
-    if "host_dut_sync_obj" in dataset:    
-        dataset["host_dut_sync_obj"] = stp.parseLogs(dataset["host_dut_sync_obj"], SYNC_targets, dataset['trace_obj'])
-    
     global file_num
     file_num += 1
 
-def add_socwatch(abs_path, osSession_etl_path):
+def add_socwatch(abs_path):
     path_set = tools.splitLastItem(abs_path, "\\", 1)
     dataset = pullData(path_set[0])
     if dataset == None:
@@ -242,7 +251,6 @@ def add_socwatch(abs_path, osSession_etl_path):
     if SOCWATCH not in dataset["data_type"] :
         dataset["data_type"].insert(0, SOCWATCH)
     dataset["socwatch_obj"] = soc.parseSocwatch(abs_path, socwatch_targets)
-    dataset["socwatch_obj"][""]
     global file_num
     file_num += 1
 
@@ -257,23 +265,6 @@ def add_pcie_only(abs_path):
     global file_num
     file_num += 1
 
-def sync_times(tdic):
-    path_set = tools.splitLastItem(tdic["dut_log"], "\\", 1)
-    dataset = pullData(path_set[0])
-    if dataset == None:
-        tools.errorAndExit("pulling data failed by using the Path as ID: " + tdic)
-    
-    if "trace_obj" in dataset:
-        dataset["host_dut_sync_obj"] = stp.parseLogs(tdic, SYNC_targets, dataset['trace_obj'])
-    else :
-        dataset["host_dut_sync_obj"] = tdic.copy()
-    if "etl_obj" in dataset and "etl_data" in dataset["etl_obj"] :  
-        sliced_list = eps.slice_power_ETL(dataset, collection)
-    global file_num
-    file_num += 3
-
-
-
 
 def fileClassifier(abs_path, f):
 
@@ -281,18 +272,13 @@ def fileClassifier(abs_path, f):
     
     if args.hobl == True and (f == CL_PASS or f == CL_FAIL):
         createDataset(tools.splitLastItem(abs_path, "\\", 1)[0])
-    elif f.find(CL_SIMPLE_REMOTE) >= 0 :
-        upto_path = tools.splitLastItem(abs_path, "\\", 1)[0]
-        hobl_log_fullPath = os.path.join(upto_path, "hobl.log")
-        CataV3_output_fullPath = os.path.join(upto_path, "CataV3_output.txt")
-        if os.path.exists(hobl_log_fullPath) and os.path.exists(CataV3_output_fullPath):
-            sync_times({"host_log":hobl_log_fullPath, "dut_log":abs_path, "catapult_output":CataV3_output_fullPath})
-        else :
-            print("==== Missing log files to sync HOST and DUT")
     elif f.find(CL_ETL) >= 0 and f.find(CL_SOCWATCH) == -1 : 
         # print("ETL detected ", abs_path, f)
         add_etl(abs_path)
         file_type = CL_ETL
+    elif f.find(CL_OUTPUT) >= 0 :
+        add_model_output(abs_path)
+        file_type = CL_OUTPUT
     elif f.find(CL_DAQ_SUMMARY) >= 0:
         add_power(abs_path)
         file_type = CL_DAQ_SUMMARY
@@ -306,13 +292,18 @@ def fileClassifier(abs_path, f):
         summary_fullPath = os.path.join(upto_path, soc_summary)
         osSession_fullPath = os.path.join(upto_path, workload_name+"_osSession.etl")
         if os.path.exists(summary_fullPath) and os.path.exists(osSession_fullPath):
-            add_socwatch(summary_fullPath, osSession_fullPath)
+            add_socwatch(summary_fullPath)
             file_type = CL_SOCWATCH
         elif os.path.exists(summary_fullPath) and not os.path.exists(osSession_fullPath):
             add_pcie_only(summary_fullPath)
             file_type = CL_SOCWATCH
         else :
             print("===== No Socwatch summary, Socwatch post-process may have interrupted or socwatch summary file name has altered", abs_path)
+        
+    elif f.lower().find(CL_SOCWATCH_CSV) >= 0:
+        # file_size = os.path.getsize(abs_path)
+        add_socwatch(abs_path)
+        file_type = CL_SOCWATCH_CSV
     return file_type
 
 
@@ -328,7 +319,7 @@ def detectAndParseFile(path) :
             if fType == CL_SOCWATCH :
                 # after detecting first Socwatch ETL, and it's summary, no need to go further
                 break
-        else :
+        elif f != "MSTeamsLogs" and f != "Training":
             # only creates data set if not collected through HOBL. 
             if args.hobl == None or args.hobl == False:
                 path_sliced = tools.splitLastItem(abs_path, "\\", 1)
@@ -338,16 +329,16 @@ def detectAndParseFile(path) :
             #recursive on a folder detection
             detectAndParseFile(abs_path)
 
-
-
 def main():
-    detectAndParseFile(collection["selected_etl_folder"])
-    detectAndParseFile(collection["selected_power_folder"])
-    detectAndParseFile(collection["selected_socwatch_folder"])
-    detectAndParseFile(collection["selected_PCIe_folder"])
 
+    detectAndParseFile(BASE)
+    pck.checkAndMarkPower(hobl_sets, picks)
     print("====[hobl_sets]", hobl_sets)
-    # rpt.writeParsedSelectionInExcel(result_path, hobl_sets, picks, socwatch_targets, PCIe_targets)
+    rpt.writeParsedAllInExcel(result_csv, hobl_sets, socwatch_targets, PCIe_targets, picks)
+    
+    # it is not detecting NPU and GPU inferencing only power on the folder of
+    # \\10.54.63.126\Pnpext\Siwoo\data\WW2537.2_Llama3.1_xPU
+    # rpt.writeInferenceOnlyInExcel(result_csv, hobl_sets, DAQ_target)
 
 
 start_time = time.perf_counter()
@@ -355,6 +346,9 @@ main()
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time
 print(f"Parsing {file_num} files Successful! [Elapsed time:::] {elapsed_time} seconds")
+
+
+
 
 
 

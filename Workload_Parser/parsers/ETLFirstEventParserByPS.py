@@ -56,7 +56,7 @@ class ETLHighPrecisionTimeExtractor:
                 ['powershell', '-Command', ps_script],
                 capture_output=True,
                 text=True,
-                timeout=15
+                timeout=60
             )
             
             if result.returncode == 0:
@@ -94,7 +94,7 @@ class ETLHighPrecisionTimeExtractor:
                 ['powershell', '-Command', ps_script],
                 capture_output=True,
                 text=True,
-                timeout=30
+                timeout=60
             )
             
             if result.returncode == 0 and result.stdout.strip():
@@ -104,3 +104,23 @@ class ETLHighPrecisionTimeExtractor:
         except (subprocess.TimeoutExpired, ValueError):
             return None
 
+    def get_quick_first_event(self, etl_file: str) -> Optional[int]:
+        """Get only FILETIME from first event (fastest method)"""
+        ps_script = f'''
+([DateTimeOffset](Get-WinEvent -Path "{etl_file}" -MaxEvents 1 -Oldest).TimeCreated).ToUnixTimeMilliseconds() 
+        '''
+        
+        try:
+            result = subprocess.run(
+                ['powershell', '-Command', ps_script],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            
+            if result.returncode == 0 and result.stdout.strip():
+                return int(result.stdout.strip())
+            return None
+            
+        except (subprocess.TimeoutExpired, ValueError):
+            return None
