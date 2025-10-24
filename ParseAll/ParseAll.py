@@ -49,6 +49,7 @@ socwatch_targets = [
     {"key": "CCE_BW", "lookup": "CCE to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
     {"key": "GT_BW", "lookup": "Chip GT Bandwidth Summary: Average Rate and Total"},
     {"key": "D2D_BW", "lookup": "Chip Die to Die Bandwidth Summary: Average Rate and Total"},
+    {"key": "IDI_BW", "lookup": "Cluster1 Cores Bandwidth Summary: Average Rate and Total"},
     {"key": "CPU_temp", "lookup": "Temperature Metrics Summary - Sampled: Min/Max/Avg"},
     {"key": "SoC_temp", "lookup": "SoC Domain Temperatures Summary - Sampled: Min/Max/Avg"},
     {"key": "NPU_Dstate", "lookup": "Neural Processing Unit (NPU) D-State Residency Summary: Residency (Percentage and Time)"},
