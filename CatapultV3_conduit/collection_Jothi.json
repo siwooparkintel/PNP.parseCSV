@@ -1,0 +1,16 @@
+[
+    {
+        "data_label":"Jothi",
+        "condition":"PTL_TME_Enabled",
+        "data_summary_type": "compact",
+        "socwatch_summary_path":".//Teams_3X3_TMEen.csv",
+		"power_summary_path":".//PTL_Teams3x3_TME_Enable.csv"
+    },  
+    {
+        "data_label":"Jothi",
+        "condition":"PTL_TME_Diabled",
+        "data_summary_type": "compact",
+        "socwatch_summary_path":".//Teams_3X3_TMEdis.csv",
+		"power_summary_path":".//PTL_Teams3x3_TME_Disable.csv"
+    }
+]

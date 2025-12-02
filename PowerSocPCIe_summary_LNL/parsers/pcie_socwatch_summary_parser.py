@@ -10,10 +10,10 @@ def NVMResidencyTable(table, target) :
     data = dict()
     header = copied[0]
     for row_idx in range(1, len(copied), 1) :
-        if "NVM" in copied[row_idx][0] :
-            for index, key in enumerate(header):
-                data[key] = copied[row_idx][index]
-
+        for device in target['devices']:
+            if device in copied[row_idx][0] :
+                for index, key in enumerate(header):
+                    data[key+"_"+device] = copied[row_idx][index]
     table['table_data'] = data
 
 
@@ -32,7 +32,7 @@ def defaultResidencyTable(table, keyIdx, ValueIdx) :
 def PCIeTableTypeChecker(table, target) :
 
     label = table['label']
-    if label == 'PCIe_LPM' or label == "PCIe_Active":
+    if label == 'PCIe_LPM' or label == "PCIe_Active" or label == "PCIe_LTRsnoop":
         NVMResidencyTable(table, target)
     else :
         defaultResidencyTable(table, 0, 1)
@@ -51,8 +51,9 @@ def extractHeader(table) :
         pcie_socwatch_header_dict[table["label"]] = set_keys
 
 
-def parsePCIe(abs_path, pcie_targets) :
+def parsePCIe(tdic, pcie_targets) :
 
+    abs_path = tdic["PCIe_socwatch_summary_path"]
     socwatch_obj = dict()
     socwatch_obj['pcie_socwatch_path'] = abs_path
     socwatch_obj['pcie_socwatch_tables'] = []

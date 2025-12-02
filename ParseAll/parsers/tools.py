@@ -7,6 +7,14 @@ def parseNumeric(text) :
 def parseDevice(text) :
     return ''.join(re.findall(r'[A-Z.0-9]', text))
 
+# add def saveLastOpenedFolder(folder_path):
+def saveLastOpenedFolder(folder_path):
+    try:
+        with open("./src/last_opened_folder.txt", "w") as f:
+            f.write(folder_path)
+    except Exception as e:
+        print(f"Failed to save last opened folder: {e}")
+
 def tryRoundifNumber(value) :
     try :
         return round(float(value), 2)

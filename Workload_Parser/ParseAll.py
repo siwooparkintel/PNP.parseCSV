@@ -25,7 +25,9 @@ parser.add_argument('-hb', '--hobl', action='store_true', help='if the data is c
 args = parser.parse_args()
 print("args: ", args)
 
+"""
 
+"""
 
 socwatch_targets = [
     {"key": "CPU_model", "lookup": "CPU native model"},
@@ -49,6 +51,7 @@ socwatch_targets = [
     {"key": "CCE_BW", "lookup": "CCE to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
     {"key": "GT_BW", "lookup": "Chip GT Bandwidth Summary: Average Rate and Total"},
     {"key": "D2D_BW", "lookup": "Chip Die to Die Bandwidth Summary: Average Rate and Total"},
+    {"key": "IDI_BW", "lookup": "Cluster1 Cores Bandwidth Summary: Average Rate and Total"},
     {"key": "CPU_temp", "lookup": "Temperature Metrics Summary - Sampled: Min/Max/Avg"},
     {"key": "SoC_temp", "lookup": "SoC Domain Temperatures Summary - Sampled: Min/Max/Avg"},
     {"key": "NPU_Dstate", "lookup": "Neural Processing Unit (NPU) D-State Residency Summary: Residency (Percentage and Time)"},
@@ -121,10 +124,45 @@ MED = "MED"
 second_folder_list = [ETL, POWER, SOCWATCH, PCIE]
 
 
+
+path_splitter = "\\"
+
+def replaceSplitter(Abs_path) :
+    Abs_path = Abs_path.replace("/", "\\")
+    return Abs_path
+
+
 #BASE = os.getcwd()
 # BASE = "\\\\10.54.63.126\\Pnpext\\Siwoo\\WW17.1_LNL32_ov20252\\test_data"
 BASE = args.input
 result_csv = args.output
+
+if BASE is None:
+    import tkinter as tk
+    from tkinter import filedialog
+
+    root = tk.Tk()
+    root.withdraw()
+    # bring last opened folder memory
+    try:
+        with open("./src/last_opened_folder.txt", "r") as f:
+            last_folder = f.read()
+            folder_path = filedialog.askdirectory(title="Select a folder", initialdir=last_folder)
+    except Exception as e:
+        print(f"Failed to read last opened folder: {e}")
+        folder_path = filedialog.askdirectory(title="Select a folder")
+        tools.saveLastOpenedFolder(folder_path)
+
+    if folder_path:
+        
+        BASE = replaceSplitter(folder_path)
+        print(f"Selected folder: {BASE}")
+        # add memory to remember last opened folder
+        tools.saveLastOpenedFolder(folder_path)
+    else:
+        tools.errorAndExit("No folder selected")
+
+
 
 if args.daq is None:
     print("============== No external DAQ.json provided")
@@ -167,13 +205,16 @@ picks = {'power_pick':MED, 'inferencingOnlyPower':False, 'sortSimilarData':False
 # if ETL, Power, Socwatch folder separation structure,
 # it returns grand parent folder name
 #=========================================================================
+
+
 def getDatasetLabel(abs_path) :
-    folder_list = abs_path.split("\\")
-    folder_structure_detector = abs_path.split("\\")[:-1]
+
+    folder_list = abs_path.split(path_splitter)
+    folder_structure_detector = abs_path.split(path_splitter)[:-1]
     last_folder = folder_structure_detector[-1]
     sl_upper = last_folder.upper()
     if sl_upper in second_folder_list:
-        return [folder_list[-4], folder_list[-3]]
+        return [folder_list[-4], folder_list[-2]]
     else :
         return [folder_list[-3], folder_list[-2]]
 
@@ -201,7 +242,7 @@ def calFromPowerModel(block) :
             block['power_obj']['power_data']['Eng(J)/Frame'] = "n/a"
 
 def add_etl(abs_path):
-    path_set = tools.splitLastItem(abs_path, "\\", 1)
+    path_set = tools.splitLastItem(abs_path, path_splitter, 1)
     dataset = pullData(path_set[0])
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
@@ -210,7 +251,7 @@ def add_etl(abs_path):
     dataset["etl_path"] = abs_path
 
 # def add_model_output(abs_path):
-#     path_set = tools.splitLastItem(abs_path, "\\", 1)
+#     path_set = tools.splitLastItem(abs_path, path_splitter, 1)
 #     dataset = pullData(path_set[0])
 #     if dataset == None:
 #         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
@@ -220,7 +261,7 @@ def add_etl(abs_path):
 #     file_num += 1
 
 def add_power(abs_path):
-    path_set = tools.splitLastItem(abs_path, "\\", 1)
+    path_set = tools.splitLastItem(abs_path, path_splitter, 1)
     dataset = pullData(path_set[0])
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
@@ -232,7 +273,7 @@ def add_power(abs_path):
     file_num += 1
 
 def add_trace(abs_path):
-    path_set = tools.splitLastItem(abs_path, "\\", 1)
+    path_set = tools.splitLastItem(abs_path, path_splitter, 1)
     dataset = pullData(path_set[0])
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
@@ -241,7 +282,7 @@ def add_trace(abs_path):
     file_num += 1
 
 def add_socwatch(abs_path):
-    path_set = tools.splitLastItem(abs_path, "\\", 1)
+    path_set = tools.splitLastItem(abs_path, path_splitter, 1)
     dataset = pullData(path_set[0])
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
@@ -252,7 +293,7 @@ def add_socwatch(abs_path):
     file_num += 1
 
 def add_pcie_only(abs_path):
-    path_set = tools.splitLastItem(abs_path, "\\", 1)
+    path_set = tools.splitLastItem(abs_path, path_splitter, 1)
     dataset = pullData(path_set[0])
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + abs_path)
@@ -268,7 +309,7 @@ def fileClassifier(abs_path, f):
     file_type = CL_UNCLASSIFIED
     
     if args.hobl == True and (f == CL_PASS or f == CL_FAIL):
-        createDataset(tools.splitLastItem(abs_path, "\\", 1)[0])
+        createDataset(tools.splitLastItem(abs_path, path_splitter, 1)[0])
     elif f.find(CL_ETL) >= 0 and f.find(CL_SOCWATCH) == -1 : 
         # print("ETL detected ", abs_path, f)
         add_etl(abs_path)
@@ -281,7 +322,7 @@ def fileClassifier(abs_path, f):
         file_type = CL_DAQ_TRACES
     elif f.find(CL_SOCWATCH) >= 0:
         workload_name = tools.splitLastItem(f, "_", 1)[0]
-        upto_path = tools.splitLastItem(abs_path, "\\", 1)[0]
+        upto_path = tools.splitLastItem(abs_path, path_splitter, 1)[0]
         soc_summary = workload_name + ".csv"
         summary_fullPath = os.path.join(upto_path, soc_summary)
         osSession_fullPath = os.path.join(upto_path, workload_name+"_osSession.etl")
@@ -322,6 +363,8 @@ def detectAndParseFile(path) :
                     createDataset(abs_path)
             #recursive on a folder detection
             detectAndParseFile(abs_path)
+
+
 
 def main():
 

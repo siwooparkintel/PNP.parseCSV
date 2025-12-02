@@ -20,7 +20,13 @@ def tryIntifNumber(value) :
     except ValueError as e:
         return value
     
-
+# add def saveLastOpenedFolder(folder_path):
+def saveLastOpenedFolder(folder_path):
+    try:
+        with open("./src/last_opened_folder.txt", "w") as f:
+            f.write(folder_path)
+    except Exception as e:
+        print(f"Failed to save last opened folder: {e}")
     
 def splitLastItem(abs_path, joint, cutNum) :
     item_list = abs_path.split(joint)
@@ -70,8 +76,8 @@ def flatten_model_dic(entry) :
 def flatten_power_dic(entry, picks):
     if "power_obj" in entry and "power_data" in entry["power_obj"] :
         copied = entry["power_obj"]['power_data'].copy()
-        # copied["power_type"] = entry['power_obj']['power_type']
-        # copied[picks['power_pick']+"_picked"] = entry['power_obj']['picked']
+        copied["power_type"] = entry['power_obj']['power_type']
+        copied[picks['power_pick']+"_picked"] = entry['power_obj']['picked']
         copied["power_path"] = entry['power_obj']['file_path']
         return copied
     else :

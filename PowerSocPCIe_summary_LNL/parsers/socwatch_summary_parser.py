@@ -5,18 +5,6 @@ import parsers.tools as tools
 
 # new socwatch header is being collected every time new header is detected
 socwatch_header_dict = dict()
-
-def tryRoundifNumber(value) :
-    try :
-        return round(float(value), 2)
-    except ValueError as e:
-        return value
-
-def tryIntifNumber(value) :
-    try :
-        return int(value)
-    except ValueError as e:
-        return value
      
 
 def cpuModelTable(table) :
@@ -34,7 +22,7 @@ def oneLineColonSeperater(table) :
     data = dict()
     for line in copied:
         items = line[0].split(":")
-        data[items[0]] = tryIntifNumber(items[-1].strip())
+        data[items[0]] = tools.tryIntifNumber(items[-1].strip())
     table['table_data'] = data 
 
 def tempAvrTable(table): 
@@ -42,27 +30,51 @@ def tempAvrTable(table):
     data = {table['label']:copied[0][4]}
     for index in range(1, len(copied), 1):
         line = copied[index]
-        data[line[0].split("/")[-1]] = tryRoundifNumber(line[4])
+        data[line[0].split("/")[-1]] = tools.tryRoundifNumber(line[4])
     table['table_data'] = data 
 
 def bwTotalAvr(table) :
     num = len(table['table_data'])
-    table['table_data'] = {table['label']+"_AvrRt(MB/s)":tryRoundifNumber(table['table_data'][num-1][2])}
+    table['table_data'] = {table['label']+"_AvrRt(MB/s)":tools.tryRoundifNumber(table['table_data'][num-1][2])}
 
 
 def coreFreqPerCoreResidencyTable(table, core_type_dict) : 
     copied = table['table_data'].copy()
     header_start = copied[0][0]
 
-    combined_data = {header_start:[]}
-    if core_type_dict is not None :
-        for TYPE in core_type_dict : 
-            core_name = core_type_dict[TYPE]
-            if core_name not in combined_data[header_start]:
-                combined_data[header_start].append(core_name)
+    freq_idx = 1
+    data_label_lead = 2
+    last_residency = 0
 
-        
-    table['table_data'] = []
+    header = copied[0][data_label_lead:]
+    # top_bin = copied[1][data_label_lead:]
+
+    for core_lable_idx in range(len(header)) :
+        if "(%)" not in header[core_lable_idx] : 
+            last_residency = core_lable_idx
+            break
+    
+    header_residency_full = header[:last_residency]
+    # top_residency_bin_trim = top_bin[:last_residency]
+
+    short_header = list()
+
+    for core_full_name in header_residency_full :
+        core_idx = core_full_name.split("/")[2]
+        short_header.append(core_idx+" "+core_type_dict[core_idx])
+
+    data = {header_start:short_header}
+
+    for index in range(1, len(copied), 1) :  # this is excluding freq 0, idle. : for index in range(1, len(copied)-1, 1) :
+        row = copied[index]
+        line_data_only = row[data_label_lead:data_label_lead+last_residency]
+        key = "-".join(row[freq_idx].split(" -- "))
+        if key == "0" : 
+            key = "0-idle"
+
+        data[key] = line_data_only
+
+    table['table_data'] = data
 
 def coreFreqResidencyTable(table, core_type_dict):
     copied = table['table_data'].copy()
@@ -118,7 +130,7 @@ def coreFreqAvrTable(table, keyIdx, ValueIdx):
     for index in range(1, len(copied), 1):
         key = copied[index][keyIdx].split("/")[2]
         value = copied[index][ValueIdx]
-        data[key] = tryIntifNumber(value)
+        data[key] = tools.tryIntifNumber(value)
     table['table_data'] = data
 
 def coreResidencyTable(table) :
@@ -129,7 +141,7 @@ def coreResidencyTable(table) :
         if key.rfind("(%)") < 0:
             break
         value = copied[1][index]
-        data[key] = tryRoundifNumber(value)
+        data[key] = tools.tryRoundifNumber(value)
     table['table_data'] = data
 
 def osWakeupsTable(table) :
@@ -194,11 +206,11 @@ def defaultResidencyTable(table, keyIdx, ValueIdx) :
         if "_Pstate" in table['label'] and idx > 0:
             key = key.split(".")[0]
 
-        data[key] = tryRoundifNumber(line[ValueIdx])
+        data[key] = tools.tryRoundifNumber(line[ValueIdx])
     table['table_data'] = data
 
 
-def socwatchTableTypeChecker(table, core_type, soc_target) :
+def socwatchTableTypeChecker(table, core_type, soc_target, data_summary_type) :
 
     label = table['label']
     if label == 'CPU_model':
@@ -209,9 +221,9 @@ def socwatchTableTypeChecker(table, core_type, soc_target) :
         osWakeupsTable(table)
     elif label == 'CPU_Pavr' : 
         coreFreqAvrTable(table, 0, 1)
-    elif label == 'CPU_Pstate' : 
-        # coreFreqResidencyTable(table, core_type)
+    elif label == 'CPU_Pstate' :
         coreFreqPerCoreResidencyTable(table, core_type)
+        # coreFreqResidencyTable(table, core_type)
     elif label == 'DC_count':
         oneLineColonSeperater(table)
     elif label == 'DDR_BW' or label == 'IO_BW' or label == 'VC1_BW' or label == 'NPU_BW' or label == 'Media_BW' or label == 'IPU_BW' or label == 'CCE_BW' or label == 'GT_BW' or label == 'D2D_BW':
@@ -239,7 +251,7 @@ def extractHeader(table) :
         socwatch_header_dict[table["label"]] = set_keys
 
 
-def parseTargetTable(target, csvreader, CORE_TYPE) :
+def parseTargetTable(target, csvreader, CORE_TYPE, data_summary_type) :
 
     tTable = dict()
     for tlist in csvreader :
@@ -248,11 +260,9 @@ def parseTargetTable(target, csvreader, CORE_TYPE) :
             # if the table_data is initiated, 'isCompleted' exists, keep collecting line until empty line comes
             if "".join(tlist) == "" :
                 tTable['isCompleted'] = True
-                socwatchTableTypeChecker(tTable, CORE_TYPE, target)
+                socwatchTableTypeChecker(tTable, CORE_TYPE, target, data_summary_type)
                 # When socwatch data is being parsed, header is also being collected and expended for unified header later
                 extractHeader(tTable)
-
-                # need to re-write this portion
                 break
             else :
                 trimmed_list = tools.trim_list(tlist)
@@ -267,8 +277,9 @@ def parseTargetTable(target, csvreader, CORE_TYPE) :
     return tTable
 
 
-def parseSocwatch(abs_path, socwatch_targets) :
+def parseSocwatch(tdic, socwatch_targets) :
 
+    abs_path = tdic["socwatch_summary_path"]
     socwatch_obj = dict()
     socwatch_obj['socwatch_path'] = abs_path
     socwatch_obj['socwatch_tables'] = []
@@ -281,18 +292,18 @@ def parseSocwatch(abs_path, socwatch_targets) :
         recheck_list = list()
         nonexist_list = list()
         for target in socwatch_targets : 
-            tTable = parseTargetTable(target, csvreader, CORE_TYPE)
+            tTable = parseTargetTable(target, csvreader, CORE_TYPE, tdic["data_summary_type"])
 
             if "label" in tTable and tTable['label'] == 'CPU_model':
                 CORE_TYPE = tTable['table_data'].copy()
 
             if len(tTable) == 0:
-                print("traget line not detected", tTable, target)
+                # print("traget line not detected", tTable, target)
                 if target["key"] not in recheck_list:
                     recheck_list.append(target["key"])
                     csvfile.seek(0)
                     csvreader = csv.reader(csvfile)
-                    tTable = parseTargetTable(target, csvreader, CORE_TYPE)
+                    tTable = parseTargetTable(target, csvreader, CORE_TYPE, tdic["data_summary_type"])
                     if len(tTable) == 0:
                         nonexist_list.append(target["key"])
                     else :

@@ -1,4 +1,5 @@
 import time
+import os
 from os import listdir
 from os.path import isfile, join
 import parsers.tools as tools
@@ -23,14 +24,54 @@ print("args: ", args)
 
 SWP = [
     {
-        "data_label":"TTL BL Browsing",
-        "condition":"CataV3+IT+CCA+LCLT+UHX2",
-        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Power_CataV3_UHX2_001_ppick\Power_CataV3_UHX2_001_pacs-summary.csv",
-        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\Socwatch_Power_CataV3_UHX2_003_spick\CataV3_UHX2_003\CataV3_IT_CCA_LCLT_UHX2_003.csv",
-        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2527.1_CataV3_UHX2\PCIe_Power_CataV3_UHX2_000\CataV3_UHX2_PCIe\CataV3_IT_CCA_LCLT_UHX2_PCIeOnly.csv"
+        "data_label":"CataV3 UHX1",
+        "condition":"CataV3+IT+CCA+UHX1",
+        "data_summary_type": "compact",
+        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2511.5_CataV3_IT\CataV3_IT_UHX_CCA\Socwatch\catav3_CCA_sw02\catav3_CCA_sw0250_pacs-summary.csv",
+        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2511.5_CataV3_IT\CataV3_IT_UHX_CCA\Socwatch\catav3_CCA_sw02\socwatch\web_catapultV3.csv",
+        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2511.5_CataV3_IT\CataV3_IT_UHX_CCA\Socwatch\catav3_IT_UHX_CCA_pcie01\IT_UHX_CCA_pcie_1\web_catapultV3.csv"
+    },    
+    {
+        "data_label":"CataV3 UHX2 baseline",
+        "condition":"CataV3+IT+BG+UHX2_10s",
+        "data_summary_type": "expanded",
+        "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_011\UHX2_DC_011_pacs-summary.csv",
+        "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_009\socwatch\CataV3_noLC_009.csv",
+        "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_007\sowatch\CataV3_noLC_007.csv"
     }
-
 ]
+
+
+
+    # {
+    #     "data_label":"CataV3 UHX1",
+    #     "condition":"CataV3+UHX1",
+    #     "data_summary_type": "compact",
+    #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW20.2_LNL32_CataV3_PC10.2\PC10.2_UHX\web_cataV3_si_001_ppick\web_cataV3_si_001\web_cataV3_si_001_pacs-summary.csv",
+    #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW20.2_LNL32_CataV3_PC10.2\PC10.2_UHX\web_cataV3_si_008_spick\socwatch\PC10.2_UHX_web_cataV3_si.csv",
+    #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW20.2_LNL32_CataV3_PC10.2\PCIe_only_Socwatch\UHX_baseline\web_cataV3_si_002_pick\socwatch\web_cataV3_si_CataV3_UHX.csv"
+    # },    
+    # {
+    #     "data_label":"CataV3 UHX1 LC",
+    #     "condition":"CataV3+UHX1+LC",
+    #     "data_summary_type": "compact",
+    #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW20.2_LNL32_CataV3_PC10.2\PC10.2_UHX_LCLT\web_cataV3_si_006_ppick\web_cataV3_si_006\web_cataV3_si_006_pacs-summary.csv",
+    #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW20.2_LNL32_CataV3_PC10.2\PC10.2_UHX_LCLT\web_cataV3_si_000_spick\socwatch\PC10.2_UHX_LCLT_web_cataV3_si.csv",
+    #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW20.2_LNL32_CataV3_PC10.2\PCIe_only_Socwatch\UHX_LCLT\web_cataV3_si_000_pick\socwatch\web_cataV3_si_CataV3_UXH_LCLT.csv"
+    # },
+    # {
+    #     "data_label":"CataV3 UHX2 baseline",
+    #     "condition":"CataV3+IT+BG+UHX2_10s",
+    #     "data_summary_type": "expanded",
+    #     "power_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_011\UHX2_DC_011_pacs-summary.csv",
+    #     "socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_009\socwatch\CataV3_noLC_009.csv",
+    #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_007\sowatch\CataV3_noLC_007.csv"
+    # },
+
+
+
+
+
 
     # {
     #     "data_label":"CataV3+CCA+LCLT+UHX2",
@@ -39,7 +80,13 @@ SWP = [
     #     "PCIe_socwatch_summary_path":r"\\amr.corp.intel.com\EC\proj\pst\jf\SPA-Lab\Siwoo\CatapultV3\WW2529.3_CV3CCALCLTUHX2\web_cataV3_si_007_PCIe\socwatch\PCIeOnly_web_cataV3_si.csv"
     # }
 
-
+    # {
+    #     "data_label":"CataV3 UHX2 baseline",
+    #     "condition":"CataV3+IT+BG+UHX2_10s",
+    #     "power_summary_path":r"\\10.54.63.126\Pnpext\Siwoo\data\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_011\UHX2_DC_011_pacs-summary.csv",
+    #     "socwatch_summary_path":r"\\10.54.63.126\Pnpext\Siwoo\data\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_009\socwatch\CataV3_noLC_009.csv",
+    #     "PCIe_socwatch_summary_path":r"\\10.54.63.126\Pnpext\Siwoo\data\WW2533.2_CataV3ITCCAUHX2_DCBAL\UHX2_DC_007\sowatch\CataV3_noLC_007.csv"
+    # },
 
 #=============================================================================
 # place this same order of the socwatch summary for ultimate performance
@@ -67,8 +114,8 @@ socwatch_targets = [
     {"key": "Media_BW", "lookup": "Media to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
     {"key": "IPU_BW", "lookup": "Image Processing Unit (IPU) to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
     {"key": "CCE_BW", "lookup": "CCE to Network on Chip (NoC) Bandwidth Summary: Average Rate and Total"},
-    {"key": "GT_BW", "lookup": "Network on a Chip GT Bandwidth Summary: Average Rate and Total"},
-    {"key": "D2D_BW", "lookup": "Network on a Chip Die to Die Bandwidth Summary: Average Rate and Total"},
+    {"key": "GT_BW", "lookup": "Chip GT Bandwidth Summary: Average Rate and Total"},
+    {"key": "D2D_BW", "lookup": "Chip Die to Die Bandwidth Summary: Average Rate and Total"},
     {"key": "CPU_temp", "lookup": "Temperature Metrics Summary - Sampled: Min/Max/Avg"},
     {"key": "SoC_temp", "lookup": "SoC Domain Temperatures Summary - Sampled: Min/Max/Avg"},
     {"key": "NPU_Dstate", "lookup": "Neural Processing Unit (NPU) D-State Residency Summary: Residency (Percentage and Time)"},
@@ -78,7 +125,7 @@ socwatch_targets = [
     {"key": "NPU_Pstate", "lookup": "Neural Processing Unit (NPU) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "1900", "1901-2900", "2901-3899", "3900"]},
     {"key": "MEMSS_Pstate", "lookup": "Memory Subsystem (MEMSS) P-State Summary - Sampled: Approximated Residency (Percentage)"},
     {"key": "NoC_Pstate", "lookup": "Network on Chip (NoC) P-State Summary - Sampled: Approximated Residency (Percentage)", "buckets":["400", "401-1049", "1050"]},
-    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-2049", "2050"]}
+    {"key": "iGFX_Pstate", "lookup": "Integrated Graphics P-State/Frequency Summary - Sampled: Approximated Residency (Percentage)", "buckets":["0", "400", "401-1799", "1800-1850", "1851-2049", "2050"]}
 ]
 
 PCIe_targets = [
@@ -233,7 +280,7 @@ def add_socwatch(tdic):
         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
     if SOCWATCH not in dataset["data_type"] :
         dataset["data_type"].insert(0, SOCWATCH)
-    dataset["socwatch_obj"] = soc.parseSocwatch(tdic["socwatch_summary_path"], socwatch_targets)
+    dataset["socwatch_obj"] = soc.parseSocwatch(tdic, socwatch_targets)
     global file_num
     file_num += 1
 
@@ -242,7 +289,7 @@ def add_pcie_only(tdic):
     dataset = pullData(ID)
     if dataset == None:
         tools.errorAndExit("pulling data failed by using the Path as ID: " + ID)
-    dataset["pcie_socwatch_obj"] = psoc.parsePCIe(tdic["PCIe_socwatch_summary_path"], PCIe_targets)
+    dataset["pcie_socwatch_obj"] = psoc.parsePCIe(tdic, PCIe_targets)
     global file_num
     file_num += 1
 

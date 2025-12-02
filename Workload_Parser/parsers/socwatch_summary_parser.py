@@ -226,7 +226,7 @@ def socwatchTableTypeChecker(table, core_type, soc_target, tdic) :
         coreFreqPerCoreResidencyTable(table, core_type) if "data_summary_type" in tdic else coreFreqResidencyTable(table, core_type)
     elif label == 'DC_count':
         oneLineColonSeperater(table)
-    elif label == 'DDR_BW' or label == 'IO_BW' or label == 'VC1_BW' or label == 'NPU_BW' or label == 'Media_BW' or label == 'IPU_BW' or label == 'CCE_BW' or label == 'GT_BW' or label == 'D2D_BW':
+    elif label == 'DDR_BW' or label == 'IO_BW' or label == 'VC1_BW' or label == 'NPU_BW' or label == 'Media_BW' or label == 'IPU_BW' or label == 'CCE_BW' or label == 'GT_BW' or label == 'D2D_BW' or label == 'IDI_BW':
         bwTotalAvr(table)
     elif label == "CPU_temp" or label == "SoC_temp":
         tempAvrTable(table)
